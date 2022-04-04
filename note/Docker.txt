@@ -1,0 +1,654 @@
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+docker --version
+
+hub.docker.com/
+
+-----------------------------------------------------------------------------------------------------------------------------
+1/install docker in EC2 linux of AWS
+
+sudo yum update -y
+sudo amazon-linux-extras install docker
+sudo yum install docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+docker info
+service docker start
+
+2/install docker-compose in EC2 linux of AWS
+
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version
+
+-----------------------------------------------------------------------------------------
+uninstall docker in EC2 linux of AWS
+
+rpm -qa | grep docker
+sudo rm -rf /var/lib/docker
+
+=> remove -> /etc/yum.repos.d/docker-ce.repo
+
+sudo yum remove docker-ce docker-ce-cli containerd.io
+sudo rm -rf /var/lib/docker
+sudo rm -rf /var/lib/containerd
+
+----------------------------------------------------------------------------------------------------------------------------
+D02 - Tìm hiểu Docker Image, chạy một Container
+
+
+xxx -> imageID
+
+Ctrl=P+Q -> thoat container ko close container
+docker pull imagename
+docker images
+docker start xxx
+docker stop xxx  -> stop khi dung ngoai container
+docker ps
+docker ps -a
+docker run -it --name "ABC" 
+docker rm xxx -> xoa container (xxx: tên hoặc imageID của container)
+docker rm -f xxx  -> stop khi dung ngoai container va khi container dang chay (them -f [force])
+docker attach containerId -> quay lai imageId dang chạy 
+exit -> thoát và exit container
+
+* Stop and remove all containers
+docker container stop $(docker container ls -aq)
+docker container rm $(docker container ls -aq)		-> REMOVE ALL CONTAINER EXISTED
+
+* Remove all stopped containers.
+docker rm $(docker ps -aq)
+
+*Stop all running containers.
+docker stop $(docker ps -aq)
+
+*Display container IDs for all containers.
+docker ps -aq
+
+
+------------------------------------------------
+D03 - Lệnh 
+
+* This command tries to access the above running docker container’s shell.
+
+docker run -it --name U1 -h ubuntu1 ubuntu
+docker exec U1 ls   -> exec ... : thi hanh container tu ben ngoai (U1: tên images)
+docker exec -it bash
+docker exec -it containerName bash
+
+# docker exec -it <contaier ID or name> <shell, sh|bash>   -> note (If we are trying to access something that doesn’t exist)
+
+1. cai htop cho ubuntu
+apt update -y
+apt install htop
+2. cai vim cho ubuntu
+apt search iputils
+apt install iputils-ping
+
+docker save --output myimage.tar imageID
+docker load -i myimage.tar
+docker tag imageId imageName:version
+
+------------------------------------------------
+D04 - Chia sẻ dữ liệu trong Docker, tạo và quản lý ổ đĩa docker volume
+
+
+1. Chia sẻ và lưu dữ liệu giữa máy host và container
+docker run -it -v pathHost:pathConatiner imageID
+Ex: docker run -it -v C:\Users\admin\Desktop:/home/sharedata 36ff
+
+2. chia sẻ dữ liệu host giữa 2 container
+docker run -it -v pathHost:pathConatiner --name C1 imageID
+docker run -it name C2 --volumes-from C1 ubuntu:latest      -> chia se container C1 cho C2
+
+3. quản lý ổ đĩa docker volume
+docker volume ls
+docker volume create D1
+docker volume D1          -> kiểm tra ổ đĩa
+docker volume create D2
+docker volume rm D1       -> xóa ổ đĩa D1
+
+* gán ổ đĩa D2 vào container để C1 lưu dữ liệu vào
+docker run -it --name C1 --mount source=D2,target=/home/disk2 ubuntu:latest  ->(chạy và gán ổ đĩa D2 [mount] cho container)
+
+#Note:
+khi xóa container nhưng ổ đĩa vẫn còn
+
+* tạo ổ đĩa ánh xạ từ máy host
+docker volume create --opt device=sorceDirectoryHost --opt type=none --opt o=bind DISK1    -> DISK1 ánh xạ ổ đĩa từ máy host
+
+*gán DISK1 cho container (dùng -v [ko dùng --mount])
+docker run -it -v DISK1:/home/disk ubuntu:latest
+
+------------------------------------------------------------------------------------
+------------How to copy files from docker container to host?------------------------
+------------------------------------------------------------------------------------
+
+1. Container -> Local Host
+docker cp <containerId>:/file/path/in/container/file /host/local/path/file
+
+Ex1: Copy /opt/app/app.log from the container d362659da5fc to the current local working directory
+$ docker cp d362659da5fc:/opt/app/app.log .
+
+Ex2: Copy /opt/app/app.log from the container d362659da5fc to local host, /home/mkyong/backup/app.log
+$ docker cp d362659da5fc:/opt/app/app.log /home/mkyong/backup/
+
+Ex3: Copy /opt/app/app.log from the container to local host, renamed to /home/mkyong/backup/app.bk.20200511.log
+$ docker cp d362659da5fc:/opt/app/app.log /home/mkyong/backup/app.bk.20200511.log
+
+Ex4: Copy files from folder /opt/app/ (container) to local host /home/mkyong/backup2/
+$ docker cp d362659da5fc:/opt/app/ /home/mkyong/backup2/
+
+
+2. Local Host -> Container
+Copy file or folder from the local file system to a docker container, it works the same.
+
+Rule: docker cp /host/local/path/file <containerId>:/file/path/in/container/file
+
+Ex1: Copy db.config from the current working directoty to a container da3430062137 /opt/app/db.config
+$ docker cp db.config d362659da5fc:/opt/app/
+
+Ex2: Copy /var/www/app/db.config from the local host to a container /opt/app/db.prod.config
+$ docker cp /var/www/app/db.config d362659da5fc:/opt/app/db.prod.config
+
+Ex3: Copy files from folder /var/www/app/ (local host) to container /opt/app/
+$ docker cp /var/www/app/ d362659da5fc:/opt/app/
+
+
+------------------------------------------------
+D05 - Mạng | Networking trong Docker, tạo và quản lý network trong container Docker
+
+docker pull busybox
+docker run -it --rm busybox  	-> chạy container busybox đúng lần
+
+docker network ls 			  	-> hiển thị các network trong docker (bridge là network mặc định được các container kết nối vào)
+
+docker network inspect bridge 	-> Kiểm tra network "bridge" có những container nào đang kết nối vào
+ 
+docker inspect name/IdContainer -> kiểm tra container đang kết nối vào mạng nào
+
+ping google.com 		-> thử gọi kết nối ra bên ngoài
+ping 172.17.0.3
+
+# Busybox có sẵn công cụ tạo máy chủ web http
+(cho 1 container chạy máy chủ web)
+
+Busybox ->  cd var/www
+đang ở www gõ -> httpd (máy chủ httpd đang làm việc nó lắng nghe các yêu cầu request gởi đến ở cổng 80 của container này)
+
+wget -O - 172.17.0.3  -> để tải trang web của conatainer khác
+
+Mạng localhost là 127.0.0.1 kết nối đến cổng 80 của conatainer B2 (cài httpd) qua cổng 8888 cuat localhost
+-> muốn vậy khi tạo container (B2) phải ánh xạ đến 172.0.0.1:8888
+Ex: docker run -it --name B2 -p 8888:80 busybox
+
+-> http://127.0.0.1:8888/  truy cập vào index.html của container B2 từ mạng bên ngoài
+
+# Tạo ra mạng cầu
+docker network create --driver bridge network1		-> tạo mạng cầu tên là network1
+docker network rm network1   -> xóa network có tên network1
+
+docker run -it --name B3 --network mynetwork busybox  -> tạo container B3 kết nối vào mạng mynetwork
+docker run -it --name B4 --network mynetwork -p 9999:80 busybox  -> chạy container B4 kết nối mạng mynetwork và ánh xạ từ cổng 80 đến 9999 của localhost
+
+B1, B2 -> cùng mạng bridge
+B3, B4 -> cùng mạng mynetwork
+
+docker network connect bridge B3  -> cho conatainer B3 kết nối vào mạng bridge
+
+wget -O - 172.17.0.3   -> B3 kêt nối B2 qua cổng 80 mở file index.html của B2
+
+* Khi 2 conatainer có cùng mạng nó có thể kết nối thông qua ip/ tên conatainer của nó
+Ex1:  	ping 172.23.0.3
+		ping B4 		-> ping B3 đến B4
+Ex2: wget -O B4
+
+
+------------------------------------------------
+D06 - Cài đặt, tạo và chạy PHP, phiên bản có PHP-FPM bằng Docker
+
+docker run -d --name c-php -h php -v C:/Install/docker/mycode/:/home/mycode/ --network www-net php:7.3-fpm
+
+-d  			-> conatainer tạo xong chạy nền luôn (-it thêm vào khi tạo xong thì cần truy cập luôn vào conatainer)
+--name  		-> đặt tên cho container là c-php
+-h php  		-> đặt tên cho host là php
+-v /mycode/:/home/mycode/  -> tạo ổ đĩa mycode từ local
+--network www-net		   -> conatainer chạy trên mạng www-net
+
+
+------------------------------------------------
+D07 - Cài đặt, chạy Apache HTTPD bằng Docker
+
+docker run --rm - /mycode/"/home/mycode/ httpd cp /usr/local/apache2/conf/httpd.conf /home/mycode/
+code /mycode/www/test.php
+chỉnh config
+
+docker run --network www-net --name c-httpd -h httpd -p 9999:80 -p 443:443 -v /mycode/:/home/mycode/ -v /mycode/httpd.conf:/usr/local/apache2/conf/httpd.conf httpd
+
+
+------------------------------------------------
+D08 - Cài đặt, chạy MySQL bằng Docker
+
+Thiết lập biến môi trường cho conatainer khi chạy
+docker run -it -rm -e BIEN1=VALUE1 -e BIEN2=VALUE2 busybox
+echo $BIEN1
+echo $BIEN2
+
+docker pull mysql
+
+docker run --rm -v /mycode/:/home/mycode mysql cp /etc/mysql/my.cnf /home/mycode/
+code /mycode/my.cnf		-> mở file nhanh bằng visual studio code IDE
+chỉnh config
+
+docker run --network www-net -e MYSQL_ROOT_PASSWORD=abc123 -v /mycode/my.cnf:/etc/mysql/my.cnf -v /mycode/db:/var/lib/mysql --name c-mysql mysql
+docker exec -it c-mysql bash  -> start conatainer từ bên ngoài
+
+mysql -u root -p[password]   -> vào kết nối của mysql server
+show tables; 
+CREATE USER 'testuser'@'%' INDENTIFIED BY 'testpass';
+CREATE DATABASE db_test;
+
+
+------------------------------------------------
+D09 - Cài đặt và chạy WordPress trên Docker
+
+GRANT ALL PRIVILEGES ON db_testdb.* TO 'testuser'@'%';
+flush privileges;
+
+
+------------------------------------------------
+D10 - Tra cứu thông tin Image, Container và giám sát hoạt động container Docker
+
+docker image history IMAGEID/Name
+docker inspect IMAGEID/Name     	-> Kiểm tra image
+docker inspect IdContainer/Name 	-> Kiểm tra conatainer
+docker diff IdContainer/Name		-> cho biết conatainer có cấu trúc file, thư mục khác gì so với image ban đầu
+docker exec -it IdContainer bash	-> vào conatainer đang chạy
+
+Ex Linux command:
+mkdir test1
+touch 1.txt
+rm dpkg.log
+
+docker logs IdContainer/name 		-> kiểm tra log của conatainer
+
+docker log --tail 10 IdContainer	-> Liệt kê 10 dòng log cuối cùng của container
+
+docker start IdContainer1 IdContainer2 IdContainer3		-> start nhiều conatainer cùng lúc
+
+docker logs -f IdContainer/Name		-> kiểm tra log cua conatainer tại thời gian thực (conatainer chạy sẽ hiển thị ra luôn)
+
+docker starts IdContainer/Name 		-> Xem dung lượng hoạt động Ram/CPU/Network/Số-tiến-1-trình-đang-chạy của conatainer đang chạy
+
+docker starts	-> giám sát tài nguyên của tất cả các docker đang chạy
+
+
+------------------------------------------------
+D11 - Biên tập Dockerfile và sử dụng lệnh docker build để tạo các Image
+
+yum -> là lệnh riêng của centos
+
+docker pull centos
+docker run -it --name cent centos:latest
+
+* Cài httpd, htop, vim cho một myimage (ở đây là centos)
+yum update -y
+yum install httpd httpd-tools -y
+
+httpd -v -> kiểm tra có httpd chưa
+yum install vim -y
+yum install epel-release -y
+yum update -y
+yum install htop -y
+yum htop -v
+
+docker cp /hostDir/index.html containerName:/var/www/html
+
+* Lưu container thành image
+docker commit cent myimage:v1	-> Lưu container thành image có tên cent với tên là myimage và version là v1
+
+docker images
+
+* Chạy conatainer từ image centos (tên myimage) vừa tạo
+docker run -rm -p 9876:80 myimage:v1 httpd -D FOREGROUND	-> -D: với tham số FOREGROUND (chạy nền)
+
+# Thay thế command bằng Dockerfile
+
+FROM centos:latest
+
+RUN yum update -y
+RUN yum install httpd httpd-tools -y
+RUN yum install vim -y
+RUN yum install epel-release -y
+RUN yum update -y
+RUN yum install htop -y
+
+WORKDIR /var/wwww/html					-> thư mục làm việc mặc định
+EXPOSE 80								-> thiết lập image lắng nghe port 80
+
+ADD ./test.html /var/wwww/html/			-> Tương tự copy file
+
+
+ENTRYPOINT [ "httpd" ]		-> khai báo: khi container tạo ra image này thì mặc nó sẽ chạy tiến trình nào
+CMD [ "-D", "FOREGROUND" ]	-> Thiết lập các tham số cho ENTRYPOINT
+
+
+# Run Dockerfile
+docker build -t myimage:v1 -f Dockerfile
+
+-t myimage 		: Đặt tên image
+-f Dockerfile	: Tên docker file
+
+
+------------------------------------------------
+D12 - Sử dụng lệnh docker-compose chạy và quản lý các dịch vụ Docker
+docker-compose -> thiết lập mặc định bởi file yaml (*.yml)
+
+
+docker-compose up
+docker-compose down
+
+docker-compose up -d  -> start running background
+
+docker-compose ps
+docker-compose ps --service  -> kiểm tra các dịch vụ trong docker-compose
+docker-compose stop 		 -> stop service
+docker-compose start
+
+docker-compose restart
+docker-compose images
+docker-compose exec my-php bash
+docker-compose logs my-php my-httpd
+
+docker-compose logs
+
+
+docker-compose stop
+docker-compose rm
+docker-compose up
+
+
+------------------------------------------------
+D14 - Sử dụng Haproxy làm server cân bằng tải với Docker
+
+docker run -v /mycode/:haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg -p 8080:80 -p 443:443 haproxy:latest
+
+
+------------------------------------------------
+D15 - Sử dụng docker-machine tạo các Docker Host
+
+docker-machine ls
+docker-machine create -driver virtualbox vps1
+docker-machine stop vps1 vps2
+docker-machine start vps1
+docker-machine rm vps2
+
+docker-machine create -driver virtualbox vps2
+
+docker-machine ssh vps1	-> vào máy ảo của docker machine vps1
+
+docker info
+
+-> chay 1 container ở trong docker-machine (tương tự)
+
+docker-machine scp -r data/ vps1:/home/ 	-> copy thư mục data từ máy host vào docker-machine (tương tự đảo thư mục nếu copy ngược lại  )
+
+docker-machine ip vps2						-> cho biết địa chỉ ip của docker=machine vps2
+
+* Tương tự nếu window thì chạy trên dùng driver hyberv 
+Ex: docker-machine create -driver hyberv vps1
+
+Để tạo máy ảo docker-machine trên win thì chạy power-shell quyền adminstrator
+
+# Note: Để tạo máy ảo docker machine
+Mac -> dùng virtualbox
+Win -> dùng hyberv
+
+
+------------------------------------------------
+D16 - Khởi tạo và quản lý Docker Swarm
+
+docker swarm init --advertise-addr=192.168.99.117
+
+docker node ls -> kiểm tra swarm có những node nào
+
+docker swarm join --token xxx ip:port
+
+docker swarm leave -> rời virtual docker khỏi swarm
+
+docker node rm IdNodeInSwarm	-> xóa khỏi swarm 1 virtual docker
+
+
+------------------------------------------------
+D17 - Chạy dịch vụ trên Docker Swarm
+
+docker push imageName:xxx -> push một image lên docker hub
+
+---------------------
+Ex: added after
+PS C:\Users\admin> docker tag f9d37652ed51 thuongtx/docker-java:1.0
+PS C:\Users\admin> docker push thuongtx/docker-java:1.0
+---------------------
+
+# Tạo ra một dịch vụ trên swarm cú pháp docker như sau:
+docker service create --replicas 5 -p 8085:8085 --name testservice imageName 
+
+-> --replicas chỉ ra số tác vụ chạy dịch vụ này
+
+docker ser ls 	-> Liệt kê các service đang chạy
+docker service ps testservice	-> kiểm tra dịch vụ đang chạy
+docker service logs testservice		-> kiểm tra log service
+docker status
+
+docker service rm testservice	-> xóa dịch vụ khỏi swarm (sẽ xóa luôn tất cả container của dịch vụ trên các virtual)
+docker service scale testservice=10		-> Thay đổi số tác vụ (container) đang chạy lên 10 từ các virtual
+
+# Thay đổi thông tin cấu hình của service khi nó đang chạy
+Ex: Thay thế dịch vụ của container từ Node (đang chạy) sang donet
+docker service update --image=image:tag serviceName
+
+
+------------------------------------------------
+D18 - Sử dụng docker stack chạy các dịch vụ trên swarm
+
+docker stats 	-> Thống kê liên tục những docker nào đang chạy
+
+
+
+========================================================================================================================================
+=======================================================DOCKER WITH JAVA, SPRINGBOOT=====================================================
+========================================================================================================================================
+
+// dockerize
+// create a docker image
+$ docker build -t docker-java:1.0 .
+$ docker build -t spring-boot:1.0 .
+
+// run it
+$ docker run -t docker-java:1.0 https://google.com
+$ docker run -d -p 8080:8080 -t spring-boot:1.0
+
+docker build -t spring-boot:1.0 .
+
+* If the docker container is running, we can access it directly with this command
+-> $ docker exec -ti container_name /bin/sh
+
+1* Find out where is java
+#which java
+
+
+2* I just realized that my docker container did not have vim installed, and had to google some commands.
+
+2.1. Ubuntu 
+apt-get update
+apt-get install vim
+
+2.2. CentOS
+yum install vim
+
+2.3. Alpine
+apk update
+apk add vim
+
+2.4. If you want to directly write the commands in the Dockerfile:
+FROM ubuntu
+RUN ["apt-get", "update"]
+RUN ["apt-get", "install", "-y", "vim"]
+
+
+3 Note: run alpine with openjdk11 installed, and start shell sh
+> docker run -it adoptopenjdk/openjdk11:alpine sh
+
+4 P.S Make sure the !# is pointed to the correct java.
+Ex: 
+#!/opt/java/openjdk/bin/java --source 11
+public class SheBang {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}
+
+
+5 How to list containers in Docker?
+# common
+$ docker ps                             // show only running containers
+$ docker ps -a                          // show all containers (running and stopped or exited)
+
+# recent containers
+$ docker ps -l                          // To show the latest created container (all states)
+$ docker ps -n=5                        // show 5 last created containers (all states)
+
+# file size
+$ docker ps -s                          // show the file size of all running containers
+$ docker ps -as                         // show the file size of all containers (all states)
+
+# show file size with -s
+# display short output with --format
+$ docker ps -as --format "{{.ID}}: {{.Image}}: {{.Status}}: {{.Size}}"
+
+# filter examples
+$ docker ps -f "status=created"         // show containers which status is `created`
+$ docker ps -f "status=exited"          // show containers which status is `exited`, stopped containers.
+$ docker ps -af "name=trusting_murdock" // show container which name is 'trusting_murdock'
+$ docker ps -af "exited=1"              // show containers which status is ` Exited (1)`, find errors.
+
+# formatting output
+$ docker ps -a --format "{{.ID}}: {{.Command}}: {{.Status}}"
+
+# misc
+$ docker ps --no-trunc                  // prevent truncating output
+
+
+6. docker ps –help
+$ docker ps --help
+
+7. What is docker –rm option
+$ docker run --rm <container_id>
+
+
+8. start container exited
+docker start dc7fbf5a5bfd
+
+
+------------------------------------------------
+
+lt --port 49001
+
+localtunnel in window
+
+
+C:\Users\admin\Desktop>lt-win -p 49001
+your url is: https://silent-moth-41.loca.lt
+
+
+https://silent-moth-41.loca.lt/
+------------------------------------------------
+
+https://silent-moth-41.loca.lt/github-webhook/
+
+
+jenkinsfile-springboot
+
+https://github.com/thuongtrinh/jenkinsfile-springboot.git
+
+
+http://hard-moose-44.loca.lt/
+
+
+------------------------------------------------
+cat /etc/group   -> check if you have a docker group already created
+
+------------------------------------------------
+Setup curl
+$apk  --no-cache add curl
+
+Setup ping
+$apt-get update
+$apt-get install iputils-ping
+------------------------------------------------
+* Gọi conatainer nginx từ bên trong container whomi
+$docker exec -it my-whomi /bin/sh
+$ping containerName
+$curl my-container:80v   -> curl đến container <my-container> ở cổng 80 
+
+------------------------------------------------
+ 
+#kiểm tra phiên bản
+docker --version
+
+#liệt kê các image
+docker images -a
+
+#xóa một image (phải không container nào đang dùng)
+docker images rm imageid
+
+#tải về một image (imagename) từ hub.docker.com
+docker pull imagename
+
+#liệt kê các container
+docker container ls -a
+
+#xóa container
+docker container rm containerid
+
+#tạo mới một container
+docker run -it imageid 
+
+#thoát termial vẫn giữ container đang chạy
+CTRL +P, CTRL + Q
+
+#Vào termial container đang chạy
+docker container attach containerid
+
+#Chạy container đang dừng
+docker container start -i containerid
+
+#Chạy một lệnh trên container đang chạy
+docker exec -it containerid command
+
+#Sau khi cài đặt, bạn có thể cho user hiện tại thuộc group docker, để khi gõ lệnh không cần xin quyền sudo
+sudo usermod -aG docker $USER
+
+------------------------------------------------
+
+- Lưu Image ra file, Nạp image từ file
+- Nếu muốn chia copy image ra máy khác ngoài cách đưa lên repository có thể lưu ra file, lệnh sau lưu image có tên myimage ra file
+
+#Lưu ra file, có thể chỉ ra đường dẫn đầy đủ nơi lưu file
+docker save --output myimage.tar myimage
+
+#File này có thể lưu trữ, copy đến máy khác và nạp vào docker, để nạp vào docker
+docker load -i myimage.tar
+
+#Đổi tên một Image đang có
+docker tag image_id imagename:version
+
+------------------------------------------------
+
+Lưu ý: trong quá trình Docker build image mới từ Dockerfile, nó có thể tạo ra các image tạm thời gây rác hệ thống. Để xóa các image tạm này hãy dùng lệnh:
+
+docker image prune
+
+------------------------------------------------

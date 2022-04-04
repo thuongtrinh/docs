@@ -1,0 +1,49 @@
+Alt+F7 = Ctrl+shift+G
+
+Press Alt+F7 to quickly locate all occurrences of code referencing the symbol at the caret, 
+		no matter if the symbol is a part of a class, method, field, parameter, or another statement.
+
+In the editor, press Ctrl+W/ Ctrl+Shift+W to extend or shrink your current code selection.
+
+You can quickly navigate in the currently edited file with Ctrl+F12 (Navigate | File Structure).
+
+IntelliJ IDEA Community can generate getter and setter methods for fields in your class. 
+	With the caret inside the class, press Alt+Insert (Code | Generate).
+
+To compare two jar files, select them in the Project view and press Ctrl+D.
+
+Press F2/ Shift+F2 to jump between the highlighted syntax errors.
+
+To select several words, press and hold Shift+Alt , and double-click each word you want to select
+
+To join two lines into one and remove unnecessary spaces, press Ctrl+Shift+J.
+
+You can invoke the Quick Definition Viewer Ctrl+Shift+I for items in code completion suggestions lists and the class, file, or symbol navigation commands.
+
+To quickly find a menu command, setting, or an action, press Ctrl+Shift+A (Help | Find Action). 
+
+To scroll a file horizontally, turn the mouse wheel while keeping Shift pressed
+
+Rename -> Position the caret at the symbol you want to rename, and press Shift+F6 (Refactor | Rename). Type the new name and press Enter .
+Shift+F6 = Ctrl+shift+S+R
+
+Alt+2: You can drag an external file from Explorer or Finder and drop it onto the Favorites tool window 
+PostNotFoundException
+
+
+Ctrl + Alt + L = format code = Ctrl+shift+F(eclipse)
+Ctrl+H (eclipse) = Ctrl+shift+F(IntelliJ) -> search string project
+
+Add a new line﻿
+Press Shift+Enter to add a new line after the current line.
+Press Ctrl+Enter to add a new line before the current line.
+
+Ctrl+shift+G = Ctrl + H (Search all - eclipse)
+
+Alt + shift + arrow up/down (move up/down line code)
+
+C:/Users/Admin/.m2/wrapper/dists/apache-maven-3.6.3-bin/1iopthnavndlasol9gbrbg6bf2/apache-maven-3.6.3
+
+C:\Windows\System32\config\systemprofile\AppData\Local\Jenkins\.jenkins\workspace\
+
+

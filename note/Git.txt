@@ -1,0 +1,456 @@
+
+1. check folder directory of current: pwd
+2. Goto one directory: cd name
+3. Remove folder: rmdir name
+4. Create folder: mkdir name
+5. Display list in directory: ls -al
+6. Open directory with sublime text: subl / . sublime
+7. Open window of visual studio code from terminal: code -n .
+8. Reset screen window: reset
+9. Open window Git: gitk
+10. git diff -> apply with file modified and it's committed
+11. Press: Q to exit after use command: git show 
+12. Command of back up a directory: cd ../
+12. vim [file name] -> open immediately a file in git cmd
+13. Create file: echo filename.txt
+
+---------------------------------------------------------------------
+0. Defines
+
+git init
+git status
+git add
+git commit
+
+git log
+git show
+git diff
+git checkout -- <file> : Delete changing of files, it's not in staging area
+git reset HEAD <file>  :	tree
+
+// working directory
+// staging area
+// git repository
+
+git checkout -b <branch>
+git checkout <branch>
+git merge
+
+https://code.pruconnect.net/projects/PVAPOL/repos/customer-portal/commits/3c2d7665fb76929fa1eb9da7b48a2a116f1655eb
+
+A <-- B
+git checkout A
+git merge B
+git branch -D <branch> (Delete a branch)
+
+1. RESET
+git reset --soft  <to commit log>	: reset commit but changes still in staging area
+git reset --mixed <to commit log> 	: reset commit but changes to woking dir
+git reset --hard  <to commit log>	: reset and delete all change files
+
+2. REVERT
+Ex: You commited with order A,B,C
+    But revert from A back to C => file committed in C will deleted but B still exist
+
+git revert <commit>
+use "git revert --abort" to cancel the revert operation
+.gitignore
+
+git revert f812f33b6f12b55d01732425231aeedaf950c8b2
+# Note: errors that need to be tested carefully before reverting
+
+---------------------------------------------------------------------
+git remote add origin https://github.com/thuongtrinh/Java8Tutorials.git
+---------------------------------------------------------------------
+
+connection git in local to git reponsitory
+//github
+git remote add origin https://github.com/thuongtrinh/online-shopping.git
+git remote -v 
+
+---------------------------
+git pull origin master    |
+git push origin master    |
+---------------------------
+
+git push origin [name of branch]
+
+
+OR: => git push orgin master --force
+
+
+Not any push: git push -u origin master
+pushed: git push
+
+…or create a new repository on the command line
+echo "# Demo" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/thuongtrinh/Demo.git
+git push -u origin master
+
+…or push an existing repository from the command line
+git remote add origin https://github.com/thuongtrinh/Demo.git
+git push -u origin master
+--------------------------------------------------------------------
+There are other branches hiding in your repository! You can see these using the -a flag:
+$ git branch -a
+---------------------------------------------------------------------
+* GIT CREDENTIAL (3 case): help save accounts in computer
+
+1. git config --global credential.helper store
+   // not recommend (~/.git-credentials)
+2. git config --global credential.helper "cache --timeout=18000/36000"
+3. google "gnome-keyring" "git ssh"
+
+---------------------------------------------------------------------
+git clone https://github.com/thuongtrinh/Demo.git
+git pull
+git push
+
+git pull origin [branch name] --> Pull changes from remote repository from other branch
+---------------------------------------------------------------------
+// Pull request
+1. git checkout -b <feature-branch>
+2. git push origin <branch>
+3. create a pull request on Github
+4. review code
+5. merge to master
+
+---------------------------------------------------------------------
+Resolve conflicts
+When will conflicts happen?
+1. Changing the same file + same line
+2. A deleted file X, B modified file X
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Method 1: (Discouraged use because change history of master when people working in same branch)
+1. Using `git rebate`
+2. Resolve conflict
+3. Push again with -f
+
+(pull and modified code is conflicted)
+git rebase master
+git status
+git add <filename is conflicted>
+git rebase --continue
+git push origin <branch-name> -f
+
+###Bổ sung chi tiết: (giải quyết conflict khi merge horse-run vào master dùng rebase)
+- feature/horse-run
+- master
+
+Rebase vào master (lưu ý pull code mới ở mỗi branch)
+1.1/ Đứng ở brach feature/horse-run: git checkout feature/horse-run
+1.2/ Rebase master: git rebase master
+1.3/ Giải quyết conflict ở các file (=====)
+1.4/ add file đã sửa confict vào stage area: git add [file name]
+1.5/ git rebase --continue
+1.66/ git push origin <branch-name> -f
+Done
+
+Cách này làm thay đổi lịch sử github
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Method 2: (recommended to use)
+1. Merge updated master to feature branch
+2. Resolve conflict
+3. Commit and push
+
+git branch
+git checkout feature/mouse-run
+git merge master
+ -> This step display conflict and start resolve
+ Update code conflict after commit code
+git add .
+git commit -m 'comment'
+
+
+Merge code master vào branch của bạn, giải quyết conflict ở branch của bạn sau đó commit lên lại master => Done
+##Bổ sung chi tiết:
+- feature/horse-run
+- master
+
+2.1/ checkout branch feature: git checkout feature/horse-run
+2.2/ merge master về: git merge master
+2.3/ mở IDE giải quyết conflict
+2.4/ git add .
+2.5/ git commit -m 'merge master' 
+2.6/ git push origin feature/horse-run
+
+***Nên dùng cách này***
+---------------------------------------------------------
+
+1. Resolve error: ! [rejected]        master -> master (non-fast-forward)
+=> git push -f origin master
+
+-------------------------------------------------------
+Xoa branch
+
+## Delete a remote branch
+$ git push origin --delete <branch> # Git version 1.7.0 or newer 
+$ git push origin :<branch> # Git versions older than 1.7.0
+
+## Delete a local branch
+$ git branch --delete <branch>
+$ git branch -d <branch> # Shorter version
+$ git branch -D <branch> # Force delete un-merged branches
+
+## Delete a local remote-tracking branch
+$ git branch --delete --remotes <remote>/<branch>
+$ git branch -dr <remote>/<branch> # Shorter
+$ git fetch <remote> --prune # Delete multiple obsolete tracking branches
+$ git fetch <remote> -p # Shorter
+
+----------------------------------------------------
+Remove folder in git
+
+git rm -r folderName
+----------------------------------------------------
+$ git clone https://github.com/thachphamblog/hoc-git.git
+$ git push origin master
+----------------------------------------------------
+$ git remote rename origin thach
+$ git remote -v
+thach https://github.com/thachphamblog/hoc-git.git (fetch)
+thach https://github.com/thachphamblog/hoc-git.git (push)
+----------------------------------------------------
+
+##Gộp 2 commit (A đã commit và B giờ commit gộp vào A) với đkiện chưa push lên repository
+$ git commit --amend -m "commit message new"
+
+------------------------------------------
+Xoa branch 2020:
+
+  binding-directives-decorators
+  components-templates-lifecycleHooks
+  http-client-and-rxjs
+* master
+  ng-form-tutorial
+  ngRx-material   b3119024d3a4f7153346e488c09cd34ec57f08b7
+  router-navigate
+
+1. Delete branch in local
+ex: git branch -d ngRx-material
+
+2. Delete branch in remote
+ex: git push -d origin ngRx-material
+
+------------------------------------------
+Commit branch mới tạo và những thay đổi lên remote
+ git push --set-upstream origin b02
+
+------------------------------------------
+Xem thông tin của màn hình git hiện tại:
+1. git config -l
+2. git config user.name
+
+------------------------------------------
+Setup nhiều tài khoản git cùng một máy tính:
+
+ssh-keygen -t rsa -C "tungtrinhit@gmail.com"
+
+ssh-keygen -t rsa -b 4096 -C "your_personal_email@domain.com"
+ssh-keygen -t rsa -b 4096 -C "your_personal_email@domain.com"
+
+------------------------------------------
+
+7. Chuyển sang nhánh khác khi đang làm việc giở
+
+# Tạm thời lưu lại các phần công việc còn đang làm dở
+$ git stash -u
+# Chuyển sang một branch khác và làm việc
+$ git checkout -b other-branch
+$ git add <các file cần thiết>
+$ git commit -m "commit message"
+# Trở về branch cũ
+$ git checkout origin-branch
+# Lấy lại các nội dung công việc đang làm dở trước đó
+$ git stash pop
+
+----------------------------------------------------------------
+
+Renaming Git Branch
+
+Follow the steps below to rename a Local and Remote Git Branch:
+1. Start by switching to the local branch which you want to rename:
+git checkout <old_name>
+
+2. Rename the local branch by typing:
+git branch -m <new_name>
+
+3. At this point, you have renamed the local branch.
+If you’ve already pushed the <old_name> branch to the remote repository , perform the next steps to rename the remote branch.
+
+4. Push the <new_name> local branch and reset the upstream branch:
+git push origin -u <new_name>
+
+5. Delete the <old_name> remote branch:
+git push origin --delete <old_name>
+
+----------------------------------------------------------------
+Update message commited:
+
+git commit --amend -m "PCAPULSEFOROPS-734: Done task RBAC"
+
+----------------------------------------------------------------
+
+I. git cherry-pick nhiều commit
+Ta cần lưu ý các cú pháp sau đây nếu muốn thêm hàng loạt commit vào branch.
+
+1. Nếu muốn thêm 1 vài commit, không liên tục, ta nhập lệnh:
+	git cherry-pick commit_id1
+or:
+	git cherry-pick commit_id1 commit_id2 commit_id3
+
+2. Nếu muốn thêm 1 loạt commit lần lượt cạnh nhau (ví dụ 5 commit liên tục):
+
+	git cherry-pick commit_id1...commit_id5
+
+3. Tuy nhiên, tình huống này thì commit id đầu tiên không được thêm vào branch. Cách làm tốt hơn là:
+
+	git cherry-pick commit_id1^..commit_id5
+
+Ex:   git cherry-pick 64ff3adde18262619ceb01a5b13d24c202931b32
+
+------------------------------------------------------------
+
+ssh-keygen -t rsa
+
+------------------------
+
+Github SSH
+
+Following the instructions on this GitHub page, I executed the command:
+ssh -vT git@github.com
+
+------------------------------------------------------------
+ssh-keygen -t rsa
+
+------------------------------GIT 2022 TIN HOC DON GIAN---------------------------------------
+
+1. Cấu hình git
+- Chú ý không cấu hình sẽ không chạy được 1 số câu lệnh như commit, clone, stash …
+- Lệnh cấu hình Tên và Email
+git config --global user.name "Tên của bạn"
+git config --global user.email "Email của bạn"
+- Kiểm tra lại config xem đã đúng chưa
+git config --list
+
+
+1.Xóa branch
+Khi toàn bộ dữ liệu trên branch đó đã được merge vào master thì dùng lệnh sau để xóa
+git branch -d ＜tên branch cần xóa＞
+Chú ý: với câu lệnh trên thi bắt buộc dữ liệu thì branch muốn xóa phải được merge vào master, không thì bạn sẽ nhận được báo lỗi
+Trường hợp branch muốn xóa chưa được merge vào master thì bạn phải dùng câu lệnh
+ git branch -D ＜tên branch cần xóa＞
+ Chú ý: trường hợp này toàn bộ các commit lên branch này sẽ bị mất
+
+2.Lệnh tra lại lịch sử
+git log
+3. Xem trạng thái hiện tại của 1 nhánh
+git status
+
+4.Thay đổi nội dung commit lần trước
+Sửa lại message commit bị nhầm
+ git commit --amend
+Trường hợp add thiếu file hoặc sửa lại file đã commit
+git add [file bị thiếu hoặc file cần sửa lại]
+git commit --amend
+
+5.Undo lại commit
+Trường hợp 1: Muốn "undo" thay đổi trên một file cố định trước khi commit
+git checkout -- [đường dẫn/tên file]
+
+Nếu muốn undo hẳn một commit (do đã lỡ commit xong rồi) thì cần chỉ định mục tiêu
+git reset --soft HEAD~1
+Ở đây HEAD~1 nghĩa là trước 1 commit. Mình dùng soft để lưu lại những thay đổi chưa commit và chỉ bỏ đi phần đã commit từ lần trước
+
+Nếu muốn bỏ cả phần đã commit từ lần trước và phần chưa commit thì đổi soft thành hard
+git reset --hard HEAD~1
+
+6. Git Clean
+Xóa hết các files chưa được commit
+git clean --force
+
+7. Thay đổi tên tác giả của commit
+git config user.name "Nguyen Van Doanh"
+git config user.email doanh@gmail.com
+git commit --amend --reset-author
+
+
+8.Thêm remote repository vào local repository
+Thêm vào
+git remote add origin [git remote url]
+Check lại xem thêm vào ok hay chưa
+git remote -v
+Thay đổi link
+git remote set-url origin [git remote url]
+
+9. Đưa code từ local repo lên remote repo
+git add .
+git commit -m “commit comment”
+git push origin [tên remote branch]
+
+
+11: Git Stash lưu lại tạm khi chuyển nhánh
+- Lưu lại trạng thái hiện tại của branch
+$ git stash save
+Lưu lại toàn bộ trạng thái hiện tại của branch
+Mỗi lần lưu sẽ tạo thành 1 version tại thời điểm đó
+
+- Xem lại danh sách đã lưu
+$ git stash save
+
+- Nếu muốn xem cả nội dung của từng thay đổi thì thêm option -p
+$ git stash list -p
+hoặc xem nội dung cụ thể hơn nữa của lần thay đổi thứ 1:
+$ git stash show stash@{1}
+
+- Lấy lại thay đổi
+$ git stash apply stash@{1}
+
+-Xóa
+$ git stash drop stash@{1}
+hoặc đơn giản hơn là
+$ git stash pop stash@{1}
+
+- Thậm chí nếu muốn xoá toàn bộ stack thì có thể dùng clear
+$ git stash clear
+
+
+------STASH GIT TONG HOP-------
+git stash save
+git stash list
+git stash pop
+
+git stash drop
+git stash clear
+------------------------------
+
+Rename your local master branch into main with the following command:
+
+$ git branch --move master main
+
+------------------------------------------------------------------------------------------
+
+…or create a new repository on the command line:
+echo "# docs" >> README.md
+
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/thuongtrinh/docs.git
+git push -u origin main
+
+------------------------------------------------------------------------------------------
+
+…or push an existing repository from the command line:
+
+git remote add origin https://github.com/thuongtrinh/docs.git
+git branch -M main
+git push -u origin main
+
+------------------------------------------------------------------------------------------
+

@@ -1,0 +1,617 @@
+
+Sau khi kích hoạt bạn có thể thực hiện các lệnh sau để kiểu tra
+
+# Lấy thông tin Cluster
+kubectl cluster-info
+
+# Các Node có trong Cluster
+kubectl get nodes
+
+1330-1544-4195-8131-3034-5634
+
+-------------------------------------------------------------
+
+K01 - Giới thiệu và cài đặt Kubernetes Cluster
+
+# Lấy thông tin Cluster
+kubectl cluster-info
+
+# Các Node có trong Cluster
+kubectl get nodes
+
+# Show detail docker-desktop
+kubectl describe node/docker-desktop
+
+There is anyone in the bathroom: có người trong toilet
+
+100002225031553
+
+show ip: 
+ip a
+
+----------
+
+vagrant up
+
+----------
+1. SSH đến máy ảo đang chạy
+
+Master:    ssh root@172.23.52.134 / 123
+Worker-1:  ssh root@172.23.53.15 / 123
+Worker-2:  ssh root@172.23.61.28 / 123
+Rancher:   ssh root@172.23.53.227 / 123
+
+2. Cài đặt K8s
+kubeadm init --apiserver-advertise-address=172.23.52.134 --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
+
+// sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+
+// kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.10/manifests/calico.yaml
+ 
+3. Xin kết nối Node vào Cluster (worker xin vào master)
+kubeadm token create --print-join-command
+
+4. Copy file về
+//Linux: scp root@172.23.52.134:/etc/kubernetes/admin.conf ~/.kube/config-mycluster
+//Windw: scp root@172.23.52.134:/etc/kubernetes/admin.conf C:/Users/admin/.kube/config-mycluster
+
+5. Thiết lập lại biến môi trường 
+//export KUBECONFIG=/Users/admin/.kube/config-mycluster
+
+export KUBECONFIG=C:/Users/admin/.kube/config-mycluster
+
+6. kết hợp 2 file: config và config-mycluster thành 1 và lưu trở lại config.
+wsl export KUBECONFIG=config:config-mycluster
+kubectl config view --flatten > config_temp
+wsl mv config_temp  config
+
+4.Xem master config: kubectl config view
+
+------------------------
+###---Tổng kết lại---###
+------------------------
+
+# khởi tạo một Cluster
+kubeadm init --apiserver-advertise-address=172.16.10.100 --pod-network-cidr=192.168.0.0/16
+
+# Cài đặt giao diện mạng calico sử dụng bởi các Pod
+kubectl apply -f https://docs.projectcalico.org/v3.10/manifests/calico.yaml
+
+# Thông tin cluster
+kubectl cluster-info
+
+# Các node (máy) trong cluster
+kubectl get nodes
+
+# Các pod (chứa container) đang chạy trong tất cả các namespace
+kubectl get pods -A
+
+# Xem nội dung cấu hình hiện tại của kubectl
+kubectl config view
+
+# Thiết lập file cấu hình kubectl sử dụng cho 1 phiên làm việc hiện tại của terminal
+export KUBECONFIG=/Users/admin/.kube/config-mycluster
+
+# Gộp file cấu hình kubectl
+export KUBECONFIG=~/.kube/config:~/.kube/config-mycluster
+kubectl config view --flatten > ~/.kube/config_temp
+mv ~/.kube/config_temp ~/.kube/config
+
+# Các ngữ cảnh hiện có trong config
+kubectl config get-contexts
+
+# Đổi ngữ cảnh làm việc (kết nối đến cluster nào)
+kubectl config use-context kubernetes-admin@kubernetes
+
+# Lấy mã kết nối vào Cluster
+kubeadm token create --print-join-command
+
+# node worker kết nối vào Cluster
+kubeadm join 172.16.10.100:6443 --token 5ajhhs.atikwelbpr0 ...
+
+-------------------------------------------------------------
+
+K02 - Cài đặt và sử dụng Kubernetes Dashboard
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.0/aio/deploy/recommended.yaml
+
+wsl curl https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.0/aio/deploy/recommended.yaml
+
+kubectl get po -n kubernetes-dashboard
+
+sudo mkdir certs
+sudo chmod 777 -R certs
+openssl req -nodes -newkey rsa:2048 -keyout certs/dashboard.key -out certs/dashboard.csr -subj "/C=/ST=/L=/O=/OU=/CN=kubernetes-dashboard"
+openssl x509 -req -sha256 -days 365 -in certs/dashboard.csr -signkey certs/dashboard.key -out certs/dashboard.crt
+sudo chmod -R 777 certs
+
+
+kubectl create secret generic kubernetes-dashboard-certs --from-file=certs -n kubernetes-dashboard
+
+kubectl get secret -n kubernetes-dashboard
+
+kubectl describe secret kubernetes-dashboard-certs -n kubernetes-dashboard
+
+kubectl get node -o wide
+
+
+1. Get tất cả các secret
+kubectl get secret -A
+
+2. Get describe của một secret
+Ex: kubectl describe secret/admin-user-token-8ml9j -n kubernetes-dashboard
+
+Token master -> kubernetes-dashboard:
+eyJhbGciOiJSUzI1NiIsImtpZCI6Il9kTjJhYXVvSzRFdWhiRTZNaXVvWkdITTRXdWp1am5VMjBmck5DTER1NXMifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLWhqcWtzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3ZjFhZGIzMi1hNzViLTQ2ZWMtYTZiMC01YWIzZmViNWU2ZWEiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZXJuZXRlcy1kYXNoYm9hcmQ6YWRtaW4tdXNlciJ9.WQSyuLelXF1gnRrkqu4LsYSAqDYrY8x5M2UOVDlUsdqOPBXxCvSSUOnV1tmgywk81svqZvseLDKjUYk-R4caKpWFxTRuIph4TcwPKMLKklJpCpCQNT_t2n6k99ddtnnmivKN3n0x8-9Bg8b0RSnsiruEGS_Gkwczl6wZ_WBcp4rANJbmJQe70juJDHODUjETd7iqhTNQPl1rpIGhhyd0NNM1fsw-c1MCGizgmhLpYynIJCI08rnfCvM8F3B5o3PybPmVqH5-k6OJYaBEthCxvt7D5vlMr3I04PzMCclNUopLXCt9VBSGkSN10NlwDf1B_O6yLC8YGqZHlilRd--C5w
+
+
+Token docker-desktop -> 
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjZPQzhuX3VlNlZ5UVZWRGZjNTJVYkRtNEhZU3ZXR0owenU2d2hyNGU2OWcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLThtbDlqIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI0OGI4MTRlZS1mYWE1LTRkNTAtYjEzZC05OWNkMWU5MjAxZjkiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZXJuZXRlcy1kYXNoYm9hcmQ6YWRtaW4tdXNlciJ9.k5rQkhOMQHVYYIjznZLyJTjcNaSKJUBPOXcMIcsYL9BoUXvM09WR12l8_WVwU4RqCOBJjvT3H_TXPe9G6KAF_avxNVtV6HHJ6bF0YUCSqpRgX0VVRMN3BZJI5YQp7n8P39bSu7f7v7FYhMdLNzgqO9AEkXTFotpzDu2vkxkJB9jGSyoLlCdfJPJEdhVRHaI-jCKyGlW3_HTJoYFOLaR9yFJH7X4SXn_c_VCiw8rgtfHDGFiEkElKhA38CN7eEFcwCc6s9bUZE2ZJ-_3vOoXTM74Ylw49V2A8gWQqlE_ZCpEf-ezAFAVpXAEVvrvFKXZdpNkunqaeWSCmAHgGaZGp-Q
+
+
+-> ở docker desktop:
+kubectl proxy
+
+-------------------------------------------------------------
+
+K03 - Sử dụng công cụ K9S quản lý K8S - Kubernetes
+
+C:\Users\admin\Downloads\Program\k9s_Windows_x86_64\k9s.exe
+
+ctrl+d xóa POD
+d tương ứng lệnh describe của POD
+l xem log
+0 xem trên tất cả các namespace
+1 xem cho namespace mặc định
+:service, :node.... tim kiếm theo theo thông tin input
+? xem các help
+
+-------------------------------------------------------------
+
+K04 - Lệnh kubectl và Node trong Kubernetes
+
+kubectl get node -o wide
+
+1. Liệt kê các kiểu tài nguyên trong k8s
+kubectl api-resources
+
+2. Xem thông tin chi tiết của node
+kubectl describe node worker1.xtl
+
+3. Get node
+kubectl get no worker1.xtl -o wide
+
+4. Xem thông tin config yaml của node
+kubectl get no worker1.xtl -o yaml
+
+5. Gán một label cho node
+kubectl label node worker1.xtl nodeabc=dechayungdungJava
+
+6. Get những node có label ta chỉ định
+kubectl get node -l "nodeabc=dechayungdungJava"
+
+7. xóa một label của node
+kubectl label node worker1.xtl nodeabc-
+
+-------------------------------------------------------------
+
+K05 - Cơ bản về POD trong Kubernetes
+
+1. Triển khai tạo Pod từ file này, thực hiện lệnh sau
+kubectl apply -f 1-swarmtest-node.yaml
+kubectl apply -f 2-nginx.yaml
+kubectl apply -f 3-tools.yaml
+
+2. delete pod
+kubectl delete pod/mypod
+
+Hoặc xóa bằng file manifests tạo ra pod:
+kubectl delete -f firstpod.yaml
+
+=> Khi những Pod này chạy trực tiếp (không phải triển khai qua Deployment, nên lệnh xóa Pod là nó mất hẳn, không tự động tạo lại).
+
+3. Xem thông tin chi tiết của Pod
+kubectl describe pod/namepod
+
+4. Liệt kê các Pod
+# Liệt kê các pod ở namespace mặc định
+kubectl get pods
+
+# Hiện thị nhiều thông tin hơn
+kubectl get pod -o wide
+kubectl get pod/mypod -o wide
+kubectl get pod/mypod -o yaml
+
+# Pod ở namepace: kubernetes-dashboard
+kubectl get pod -o wide -n kubernetes-dashboard
+
+# Pod ở tất cả các namespace
+kubectl get pod -A
+
+# Liệt kê các Pod có nhãn app: mypod
+kubectl get pod -l "app=mypod"
+
+5. xem những sự kiện vừa xảy ra trong pod
+kubectl get ev
+
+6. Sửa đổi thông tin manifest của pod
+kubectl edit pod/mypod
+
+7. Xem log của pod
+kubectl logs pod/mypod
+
+8. Thi hành lệnh trong container của một pod
+kubectl exec ungdungnode ls /
+
+9. Thi hành lệnh vào terminal của container trong pod
+kubectl exec -it tools bash
+
+* Nếu pod có nhiều container thì phải chỉ ra tên container cho bash
+kubectl exec -it tools -c my-container bash
+
+* Mỗi pod đang chạy có một ip, nó là ip trong mạng nội bộ của cluster 
+Nên từ trong container của pod này có thể ping đến pod khác
+
+ping   192.168.41.131
+curl   192.168.41.131
+curl   192.168.182.3:8085
+
+=> chỉ đang truy cập nội bộ, bên ngoài muốn truy cập vào phải dùng service, secret...
+
+* Tuy nhiên chúng ta có thể truy cập thông qua proxy, để truy cập vào các pod từ bên ngoài
+kubectl proxy
+-> Starting to serve on 127.0.0.1:8001
+
+http://localhost:8001/api/v1/namespaces/default/pods/nginxapp/proxy/
+http://localhost:8001/api/v1/namespaces/default/pods/ungdungnode/proxy/
+http://localhost:8001/api/v1/namespaces/default/pods/nginx-swarmtest:8085/proxy/
+...
+
+-------------------------------------------------------------
+
+K06 - POD trong Kubernetes, Pod nhiều container, Volume trong POD (phần 2)
+
+1. Xem chi tiết nginx-swarmtest
+kubectl describe po/nginx-swarmtest
+
+2. Liệt kê container chỉ định trong pods
+kubectl exec -it nginx-swarmtest ls / -c [name-container]
+kubectl exec -it nginx-swarmtest ls / -c s1
+
+3. Đi vào terminal của container
+kubectl exec -it nginx-swarmtest -c [name-container] bash
+kubectl exec -it nginx-swarmtest -c s1 bash
+
+4. tạo file index.hmtl để start server load index mặc định, theo định nghĩa trong volumn
+path: "/home/html"
+ 
+5. Có thể start pod chạy ở một node chỉ định
+- Get thông tin nodeSelector của node
+kubectl describe node/worker1.xtl
+
+* Label info cần get
+kubernetes.io/hostname=worker1.xtl
+
+- Thay vào nodeSelector trong manifest
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: worker1.xtl
+
+6. Xóa tất cả các pod bởi thư mục
+kubectl delete -f ../1.pods/
+
+-------------------------------------------------------------
+
+K07 - ReplicaSet và HPA trong Kubernetes
+
+1. Lệnh get all action của pod/service/deployment... các trên các node đang hoạt động
+kubectl get all -o wide
+
+2. Dùng lệnh watch để theo dõi hoạt động của các node
+- Test watch command đã tồn tại chưa:
+wsl watch -n 1 date
+
+wsl watch -n 1 "kubectl get all -o wide"
+
+4. Get ds các replicaSet
+kubectl get rs -o wide
+
+kubectl get rs -o yaml
+
+5. Get ds các po theo nhãn
+kubectl get po -l "app=label"
+-> sẽ có mục SELECTOR là nhãn để chọn ra những pod nó quản lý
+
+Ex:  kubectl get po -l "app=rsapp"
+
+6. Xem thông tin tiết pod
+kubectl describe po/ten-pod
+kubectl describe po/rsapp-sqjgd
+
+Có thêm thông tin -> Controlled By:  ReplicaSet/rsapp
+Chứng tỏ pod này không phải tạo độc lập mà nó được điều khiển bởi một replicaSet
+
+7. Xóa pod
+kubectl delete po/ten-pod
+kubectl delete po --all
+
+8. Xóa replicaSet thì các pod tạo ra từ nó sẽ xóa theo
+* Xóa từ tên của replicaSet
+kubectl delete rs [ten-replicaSet]
+kubectl delete rs rsapp
+
+* OR: xóa từ file manifest
+kubectl delete -f 2.rs.yaml
+
+9. Xóa nhãn trong pod tương tự trong node
+kubectl label po/rsapp-dx22n app-
+
+Khi xóa nhãn của pod tạo ra từ replicaSet thì pod đó sẽ không còn nằm trong quản lý của replicaSet đó nữa
+
+10. Horizontal Pod Autoscaler với ReplicaSet
+a. dùng lệnh
+kubectl autoscale rs rsapp --max=2 --min=1
+
+b. Để liệt kê các hpa gõ lệnh
+kubectl get hpa
+
+c. cấu hình file yaml. Thực hiện lệnh để triển khai
+kubectl apply -f 2.hpa.yaml
+
+-------------------------------------------------------------
+
+K08 - Deployment trong Kubernetes triển khai cập nhật và scale
+
+1. Thực hiện lệnh sau để triển khai
+kubectl apply -f 1.myapp-deploy.yaml
+
+2. Khi Deployment tạo ra, tên của nó là deployapp, có thể kiểm tra với lệnh:
+kubectl get deploy -o wide
+kubectl get deploy -o yaml
+
+3. Deploy này quản sinh ra một ReplicasSet và quản lý nó, gõ lệnh sau để hiện thị các ReplicaSet
+kubectl get rs -o wide
+
+4. Đến lượt ReplicaSet do Deploy quản lý lại thực hiện quản lý (tạo, xóa) các Pod, để xem các Pod
+kubeclt get po -o wide
+
+# Hoặc lọc cả label
+kubectl get po -l "app=deployapp" -o wide
+
+5. Thông tin chi tiết về deploy
+kubectl describe deploy/deployapp
+
+6.Kiểm tra các lần cập nhật (revision)
+kubectl rollout history deploy/deployapp
+
+7. Để xem thông tin bản cập nhật 1 thì gõ lệnh
+kubectl rollout history deploy/deployapp --revision=1
+
+8. Khi cần quay lại phiên bản cũ nào đó, ví dụ bản revision 1
+kubectl rollout undo deploy/deployapp --to-revision=1
+
+9. Scale Deployment
+a. scale với lệnh:
+kubectl scale deploy/deployapp --replicas=10
+kubectl autoscale deploy/deployapp --min=2 --max=5 --cpu-percent=50
+
+b. Scale từ khai báo trong một yaml. Hoặc có thể trích xuất scale ra để chỉnh sửa
+kubectl get hpa/deployapp -o yaml > 2.hpa.yaml
+
+-------------------------------------------------------------
+
+K09 - Triển khai Metrics Server trên Kubernetes
+
+- Triển khai metrics server
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+
+        args:
+          - --cert-dir=/tmp
+          - --secure-port=4443
+          - --kubelet-insecure-tls
+          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+
+- Sửa file components.yml như trên rồi thực hiện lệnh:
+kubectl apply -f components.yml
+
+- Xem mức độ sử dụng bộ nhớ của các node/pod
+kubectl top node
+kubectl top pod -A
+
+-------------------------------------------------------------
+
+K10 - Sử dụng Service và Secret Tls trong Kubernetes
+
+1. Triển khai file service
+ kubectl apply -f 1.svc1.yaml
+
+# lấy các service
+ kubectl get svc -o wide
+
+# xem thông tin của service svc1
+ kubectl describe svc/svc1
+
+# vào terminal của pod có tên tools
+ kubectl exec -it tools bash
+
+# Lấy tất cả endpoints
+ kubectl get endpoints
+
+#Get pod theo label
+ kubectl get po -l "app=app1" -o wide
+
+# Show logs của pod
+ kubectl logs pod/nginx-6db98fcd56-9h4jp
+
+2. Tự sinh xác thực với openssl
+Thực hiện lệnh sau để sinh file tự xác thực
+
+openssl req -nodes -newkey rsa:2048 -keyout tls.key  -out ca.csr -subj "/CN=thuongtx.net"
+openssl x509 -req -sha256 -days 365 -in ca.csr -signkey tls.key -out tls.crt
+
+
+3. Tạo Secret tên secret-nginx-cert chứa các xác thực
+ 
+- Thi hành lệnh sau để tạo ra một Secret (loại ổ đĩa chứa các thông tin nhạy cảm, nhỏ), Secret này kiểu tls, tức chứa xác thức SSL
+kubectl create secret tls secret-nginx-cert --cert=certs/tls.crt  --key=certs/tls.key
+
+- Secret này tạo ra thì mặc định nó đặt tên file là tls.crt và tls.key có thể xem với lệnh
+kubectl describe secret/secret-nginx-cert
+
+
+# Show các secret
+kubectl get secret -o wide 
+
+-------------------------------------------------------------
+
+K11 - DaemonSet, Job, CronJob trong Kubernetes
+
+1.DaemonSet
+
+# Liệt kê các DaemonSet
+kubectl get ds -o wide
+
+# Liệt kê các POD theo nhãn
+kubectl get pod -o wide -l "app=ds-nginx"
+
+# Chi tiết về ds
+kubectl describe ds/dsapp
+
+# Xóa DaemonSet
+kubectl delete ds/dsapp
+
+#Taints:             node-role.kubernetes.io/master:NoSchedule
+# xóa taint trên node master.xtl cho phép tạo Pod
+kubectl taint node master.xtl node-role.kubernetes.io/master-
+
+# thêm taint trên node master.xtl ngăn tạo Pod trên nó
+kubectl taint nodes master.xtl node-role.kubernetes.io/master=false:NoSchedule
+
+2. Job
+
+# Triển khai 1 job
+kubectl apply -f 2.job.yaml
+
+# Thông tin job có tên myjob
+kubectl describe job/myjob
+
+-------------------------------------------------------------
+
+K12 - Sử dụng Persistent Volume (pv) và Persistent Volume Claim (pvc) trong Kubernetes
+
+# triển khai
+kubectl apply -f 1.persistent-vol.yaml
+
+# liệt kê các PV
+kubectl get pv -o wide
+
+# thông tin chi tiết
+kubectl describe pv/pv1
+
+# triển khai
+kubectl apply -f 2.persistent-vol-claim.yaml
+
+kubectl get pvc,pv -o wide
+kubectl describe pvc/pvc1
+
+-------------------------------------------------------------
+
+K13 - Sử dụng Persistent Volume (pv) NFS trong kubernetees
+
+1. Cài đặt NFS làm Server chia sẻ file (Kubernetes)
+yum install nfs-utils
+
+#Kích hoạt và chạy các dịch vụ cần thiết:
+
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+
+systemctl start rpcbind
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+
+ạo (mở) file /etc/exports để soạn thảo, ở đây sẽ cấu hình để chia sẻ thư mục /data/mydata/
+
+vi /etc/exports
+/data/mydata  *(rw,sync,no_subtree_check,insecure)
+Lưu thông lại, và thực hiện
+
+# Tạo thư mục
+mkdir -p /data/mydata
+chmod -R 777 /data/mydata
+
+# export và kiểm tra cấu hình chia sẻ
+exportfs -rav
+exportfs -v
+showmount -e
+
+# Khởi động lại và kiểm tra dịch vụ
+systemctl stop nfs-server
+systemctl start nfs-server
+systemctl status nfs-server
+
+ssh root@172.16.10.101
+yum install nfs-utils
+mkdir /home/data
+
+# Gắn ổ đĩa
+mount -t nfs 172.16.10.100:/data/mydata /home/data/
+
+# Kiểm tra xong, hủy gắn ổ đĩa
+umount /home/data
+
+2. Tạo PersistentVolume NFS
+kubectl apply -f 1-pv-nfs.yaml
+kubectl get pv -o wide
+kubectl describe pv/pv1
+
+3. Tạo PersistentVolumeClaim NFS
+kubectl apply -f 2-pvc-nfs.yaml
+kubectl get pvc,pv -o wide
+
+-------------------------------------------------------------
+
+K14 - Sử dụng Ingress trong Kubernetes
+
+1. Cài đặt HAProxy Ingress Controller
+#Tạo namespace có tên ingress-controller
+kubectl create ns ingress-controller
+
+# Kiểm tra
+kubectl get ns
+
+# Triển khai các thành phần
+kubectl apply -f https://haproxy-ingress.github.io/resources/haproxy-ingress.yaml
+
+# Thực hiện đánh nhãn các Node có thể chạy POD Ingress
+# Gán thêm label cho các Node (ví dụ node worker2.xtl, worker1.xtl ...)
+kubectl label node master.xtl role=ingress-controller
+kubectl label node worker1.xtl role=ingress-controller
+kubectl label node worker2.xtl role=ingress-controller
+
+# Kiểm tra các thành phần
+kubectl get all -n ingress-controller
+
+kubectl get ingress -n ingress-controller
+
+
+
+#C:\Windows\System32\drivers\etc\hosts
+
+-------------------------------------------------------------
+
+K15-16 - Sử dụng Rancher để quản lý Kubernetes Cluster
+
+1. Triển khai Rancher
+
+docker run -d --restart=unless-stopped -p 80:80 -p 443:443  --privileged rancher/rancher:latest
+
+-------------------------------------------------------------
+
+
+
