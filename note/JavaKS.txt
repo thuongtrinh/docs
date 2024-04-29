@@ -10,9 +10,9 @@ converter.setKeyPair(keyStoreKeyFactory.getKeyPair("jwt"));
 =========================================================================================================================
 1. Import certificate local:
 
-keytool -delete -alias "momo-certificate" -keystore "%JAVA_HOME\jre\lib\security\cacerts" storepass changeit
+keytool -delete -alias "test-certificate" -keystore "%JAVA_HOME\jre\lib\security\cacerts" storepass changeit
 
-keytool -import -noprompt -trustcacerts -alias "momo-certificate" -file "C:\Users\369222\Downloads\momo.cer" -keystore "%JAVA_HOME\jre\lib/security/cacerts" storepass changeit
+keytool -import -noprompt -trustcacerts -alias "test-certificate" -file "C:\Users\admin\Downloads\test.cer" -keystore "%JAVA_HOME\jre\lib/security/cacerts" storepass changeit
 
 =========================================================================================================================
 2. Creating the Java KeyStore and convert-to-pem-format:
@@ -82,36 +82,35 @@ keytool -exportcert -alias senderKeyPair -storetype JKS -keystore sender_keystor
 keytool -importcert -alias receiverKeyPair -storetype JKS -keystore receiver_keystore.jks -file sender_certificate.cer -rfc -storepass changeit
 
 =========================================================================================================================
-1. RSA Key Pair Generation SA_COM
+1. RSA Key Pair Generation TEST_COM
 
-b1: keytool -genkeypair -keysize 2048 -keyalg RSA -alias apibanking-sig-key -keystore scb-api-banking.jks
+b1: keytool -genkeypair -keysize 2048 -keyalg RSA -alias apibking-sig-key -keystore cb-api-bking.jks
 
 b2: The jks file is created as below from the above step
 	ls -ltr
 
-b3: keytool -list -keystore scb-api-banking.jks -storepass 123456
+b3: keytool -list -keystore cb-api-bking.jks -storepass 123456
 
-b4: keytool -exportcert -keystore scb-api-banking.jks -alias apibanking-sig-key -rfc -file certificate.pem
+b4: keytool -exportcert -keystore cb-api-bking.jks -alias apibking-sig-key -rfc -file certificate.pem
 
-b5: openssl x509 -pubkey -noout -in certificate.pem > pubkey.pem    -> This key (pubkey.pem) needs to be sent to the bank.
+b5: openssl x509 -pubkey -noout -in certificate.pem > pubkey.pem    -> This key (pubkey.pem) needs to be sent to bk.
 
 2. Certificate Signing Request Generation (CSR)
 
-b6: openssl genrsa -out ./scb-apibanking-client-cert-private-key.pem 2048
+b6: openssl genrsa -out ./cb-apibking-client-cert-private-key.pem 2048
 
-b7: openssl req -new -sha256 -key scb-apibanking-client-cert-private-key.pem -out ./scb-apibanking-client-cert-csr.pem
+b7: openssl req -new -sha256 -key cb-apibking-client-cert-private-key.pem -out ./cb-apibking-client-cert-csr.pem
 
 
---------the bank in-turn sends 2 files: activation-key.json / client.cer This must be imported under the Java key store------------
+--------the bk in-turn sends 2 files: activation-key.json / client.cer This must be imported under the Java key store------------
 
-2) client.cer – This file is the signed Certificate provided by Standard Chartered Bank. This must be imported under the Java
-key store as below
+2) client.cer – This file is the signed Certificate provided by Standard Chartered. This must be imported under the Java key store as below
 
-openssl pkcs12 -export -in client.cer -inkey scb-apibanking-client-cert-private-key.pem -out scb-apibanking.keystore.p12 -name 1
+openssl pkcs12 -export -in client.cer -inkey cb-apibking-client-cert-private-key.pem -out cb-apibking.keystore.p12 -name 1
 
-keytool-importkeystore -deststorepass 123456 -destkeypass 123456 -destkeystore scb-api-banking.jks -srckeystore scb-apibanking.keystore.p12 -srcstoretype PKCS12 -srcstore -pass 123456 -alias 1
+keytool-importkeystore -deststorepass 123456 -destkeypass 123456 -destkeystore cb-api-bking.jks -srckeystore cb-apibking.keystore.p12 -srcstoretype PKCS12 -srcstore -pass 123456 -alias 1
 
-keytool -list -keystore scb-api-banking.jks -storepass 123456
+keytool -list -keystore cb-api-bking.jks -storepass 123456
 
 
 =========================================================================================================================
@@ -127,6 +126,5 @@ Export Public Key:
 keytool -list -rfc --keystore mytest.jks | openssl x509 -inform pem -pubkey
 
 =========================================================================================================================
-
 
 keytool -genkeypair -alias mytest  -keyalg RSA   -keypass mypass   -keystore mytest.jks  -storepass mypass
