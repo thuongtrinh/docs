@@ -25,6 +25,7 @@ git commit
 git log
 git show
 git diff
+git diff --staged
 git checkout -- <file> : Delete changing of files, it's not in staging area
 git reset HEAD <file>  :	tree
 
@@ -79,6 +80,7 @@ git push origin [name of branch]
 OR: => git push orgin master --force
 
 
+Not any push: git push -u origin master
 Not any push: git push -u origin master
 pushed: git push
 
@@ -151,7 +153,9 @@ Rebase vào master (lưu ý pull code mới ở mỗi branch)
 Done
 
 Cách này làm thay đổi lịch sử github
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Method 2: (recommended to use)
 1. Merge updated master to feature branch
 2. Resolve conflict
@@ -219,7 +223,7 @@ thach https://github.com/thachphamblog/hoc-git.git (push)
 ##Gộp 2 commit (A đã commit và B giờ commit gộp vào A) với đkiện chưa push lên repository
 $ git commit --amend -m "commit message new"
 
-------------------------------------------
+------------------------------------------------------------------------------------
 Xoa branch 2020:
 
   binding-directives-decorators
@@ -236,16 +240,16 @@ ex: git branch -d ngRx-material
 2. Delete branch in remote
 ex: git push -d origin ngRx-material
 
-------------------------------------------
+------------------------------------------------------------------------------------
 Commit branch mới tạo và những thay đổi lên remote
  git push --set-upstream origin b02
 
-------------------------------------------
+------------------------------------------------------------------------------------
 Xem thông tin của màn hình git hiện tại:
 1. git config -l
 2. git config user.name
 
-------------------------------------------
+------------------------------------------------------------------------------------
 Setup nhiều tài khoản git cùng một máy tính:
 
 ssh-keygen -t rsa -C "tungtrinhit@gmail.com"
@@ -253,7 +257,7 @@ ssh-keygen -t rsa -C "tungtrinhit@gmail.com"
 ssh-keygen -t rsa -b 4096 -C "your_personal_email@domain.com"
 ssh-keygen -t rsa -b 4096 -C "your_personal_email@domain.com"
 
-------------------------------------------
+------------------------------------------------------------------------------------
 
 7. Chuyển sang nhánh khác khi đang làm việc giở
 
@@ -268,7 +272,7 @@ $ git checkout origin-branch
 # Lấy lại các nội dung công việc đang làm dở trước đó
 $ git stash pop
 
-----------------------------------------------------------------
+----------------------------------------------------------------------------------
 
 Renaming Git Branch
 
@@ -288,12 +292,12 @@ git push origin -u <new_name>
 5. Delete the <old_name> remote branch:
 git push origin --delete <old_name>
 
-----------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 Update message commited:
 
 git commit --amend -m "PCAPULSEFOROPS-734: Done task RBAC"
 
-----------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 I. git cherry-pick nhiều commit
 Ta cần lưu ý các cú pháp sau đây nếu muốn thêm hàng loạt commit vào branch.
@@ -313,18 +317,18 @@ or:
 
 Ex:   git cherry-pick 64ff3adde18262619ceb01a5b13d24c202931b32
 
-------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 
 ssh-keygen -t rsa
 
-------------------------
+------------------------------------------------------------------------------------------------------
 
 Github SSH
 
 Following the instructions on this GitHub page, I executed the command:
 ssh -vT git@github.com
 
-------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 ssh-keygen -t rsa
 
 ------------------------------GIT 2022 TIN HOC DON GIAN---------------------------------------
@@ -419,14 +423,14 @@ $ git stash pop stash@{1}
 $ git stash clear
 
 
-------STASH GIT TONG HOP-------
+------STASH GIT TONG HOP-------------------------------------------------
 git stash save
 git stash list
 git stash pop
 
 git stash drop
 git stash clear
-------------------------------
+------------------------------------------------------------------------
 
 Rename your local master branch into main with the following command:
 
@@ -453,4 +457,111 @@ git branch -M main
 git push -u origin main
 
 ------------------------------------------------------------------------------------------
+fatal: refusing to merge unrelated histories 
 
+dung lenh: (khi merge master về main local lần đầu)
+ git pull origin main --allow-unrelated-histories
+
+------------------------------------------------------------------------------------------
+
+https://github.com/
+account: thuongtrinh 
+key: thuong92@
+email: trinhxuan92@gmail.com
+
+1. Cau hinh git:
+git config --global user.name thuongtrinh
+git config --global user.email trinhxuan92@gmail.com
+
+2. Xem thong tin cau hinh
+git config --list
+git config X (X là tên thuộc tính cần xem giá trị cấu hình)
+
+3. Xem các thông số của số liệu câu lệnh X nào đó
+git help X
+git X -help
+man git -X
+-------------------------------------------------------------------
+4. Local Repository
+git status
+git add readme.txt
+git commit
+Note:
+Case 1: edit readme.txt
+1. git status
+2. git add readme.txt
+3. git status
+4. git commit -m  "Comment"
+5. git status
+
+Case 2: Edit file readme.txt
+1. git status
+2. git commit -m  "Comment"
+3. git commit -a -m  "Comment"  => [Bỏ qua giai đoạn add file với điều kiện file đó đã được add lần đầu tiền]
+4. git status
+5. git log  => [Xem đã commit bao nhiêu lần]
+
+I. Clone repository về
+$ git clone https://github.com/thachphamblog/hoc-git
+
+Note: Lệnh touch là tạo ra một tập tin rỗng.
+Ex: $ touch faq.html
+
+II.
+Lệnh commit trong Git sẽ là git commit -m "Lời nhắn".
+Và nếu bạn muốn đưa tập tin lên repository thì bạn phải commit nó trước rồi sau đó lệnh git push origin master sẽ có nhiệm vụ đưa toàn bộ các tập tin đã được commit lên repository.
+
+Trong Git, bạn có thể đưa một tập tin từ Tracked về Untracked với lệnh rm tên_file. Lệnh rm sẽ giúp bạn đưa tập tin về trạng thái Untracked nhưng không xóa hẳn trong ổ cứng.
+Còn nếu bạn muốn xóa nó luôn thì dùng lệnh git rm -f tên_file và nhớ cẩn thận khi dùng lệnh này.
+
+III. Git log
+Để xem lịch sử của các lần commit trước đó, bạn sử dụng lệnh git log là sẽ thấy.
+Ngoài ra, bạn có thể chèn thêm tham số -p vào để hiển thị chi tiết của mỗi lần commit.
+$ git log -p
+
+Undo Commit
+Nếu bạn cần xóa bỏ lần commit trước và cần undo để commit lại thì có thể sử dụng tham số --amend trong lệnh git commit.
+
+$ git log --pretty="%s"
+Hihi
+First commit on Github
+$ git commit --amend -m "Hehe"
+
+1. Bỏ tập tin ra khỏi Staging Area
+Nếu bạn đã đưa một tập tin nào đó vào Staging Area nhưng bây giờ bạn muốn loại bỏ nó ra khỏi đây để không phải bị commit theo thì có thể sử dụng lệnh git reset HEAD tên_file
+
+IV. REMOTE RESPOSITORY VÀ ORIGIN
+Để kiểm tra tên remote, bạn có thể gõ lệnh git remote -v.
+Đổi tên remote
+$ git remote rename origin thach
+Thêm một remote
+git remote add tên_remote URL
+
+1.
+- Gõ lệnh git lg thì bạn sẽ thấy từ khóa HEAD cho bạn biết bạn đang ở đâu trong working tree.
+- Xem toàn bộ các branch mà bạn đang có trong working tree bằng lệnh git branch
+- Nếu muốn tạo thêm branch, chỉ cần gõ lệnh git branch tên_brand
+- Checkout một branch: Checkout ở đây nghĩa là bạn truy cập kiểm tra mã nguồn trong branch đó để làm việc đấy. Để làm việc này, bạn sử dụng lệnh git checkout tên_branch
+- Để chuyển về branch chính thì gõ git checkout master
+Ex:
+Ví dụ mình cần chuyển dữ liệu từ branch develop về master thì sẽ làm lần lượt các lệnh sau:
+
+$ git checkout master
+Already on 'master'
+Your branch is ahead of 'thach/master' by 3 commits.
+ (use "git push" to publish your local commits)
+$ git merge develop
+Updating 83e9976..8c68896
+Fast-forward
+ develop.html | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 develop.html
+$ ls
+develop.html faq.html README.md tag.html version1.txt
+
+- Xóa branch
+Nếu bạn không cần dùng tới branch nào nữa thì có thể xóa với lệnh git branch -d tên_branch. Lưu ý là cái branch muốn xóa phải được gộp dữ liệu (merge) về master.
+$ git branch -d develop
+
+
+---------------------------------------------------------------------------------------------------------------------------------------

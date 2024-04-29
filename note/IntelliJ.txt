@@ -1,3 +1,27 @@
+=> Phim tat eclipse
+Ctrl + W	Đóng tab hiện tại
+Ctrl + Q	Đưa con trỏ đến vị trí mà bạn vừa sửa.
+Ctrl + B 	Build project
+
+Ctrl + E	Mở danh sách các file đang mở, cho phép tìm kiếm, và goto đến 1 file nào đó
+Ctrl + F6	Di chuyển nhanh đến 1 file trong danh sách các file đang mở.
+
+Ctrl+Shift+Enter	Chèn thêm 1 dòng ở trên dòng hiện tại.
+Ctrl + Shift + X	CHUYỂN ĐOẠN ĐƯỢC CHỌN SANG CHỮ HOA
+Ctrl + Shift + Y	Chuyển đoạn được chọn sang chữ thường
+Ctrl + Shift + W  	Đóng toàn bộ các tab đang mở
+
+Alt + mũi tên lên/xuống Di chuyển dòng hiện tại lên/xuống
+Alt + Shift + S, V	Override hoặc implement một hàm
+Alt + Shift + S, R	Tạo hàm getter, setter cho field trong class
+Alt + Shift + S, C 	Tạo hàm khởi tạo bằng cách override hàm khởi tạo lớp cha
+Alt + Shift + S, O	Tạo hàm khởi tạo bằng các field trong class
+
+F3	Xem nội dung của hàm đang được chọn (nếu hàm này ở file khác thì tự động mở file đó ra)
+
+========================================================================================================================
+=> Phim tat IntelliJ
+
 Alt+F7 = Ctrl+shift+G
 
 Press Alt+F7 to quickly locate all occurrences of code referencing the symbol at the caret, 
@@ -34,7 +58,7 @@ PostNotFoundException
 Ctrl + Alt + L = format code = Ctrl+shift+F(eclipse)
 Ctrl+H (eclipse) = Ctrl+shift+F(IntelliJ) -> search string project
 
-Add a new line﻿
+Add a new line
 Press Shift+Enter to add a new line after the current line.
 Press Ctrl+Enter to add a new line before the current line.
 
@@ -45,5 +69,38 @@ Alt + shift + arrow up/down (move up/down line code)
 C:/Users/Admin/.m2/wrapper/dists/apache-maven-3.6.3-bin/1iopthnavndlasol9gbrbg6bf2/apache-maven-3.6.3
 
 C:\Windows\System32\config\systemprofile\AppData\Local\Jenkins\.jenkins\workspace\
+
+========================================================================================================================
+
+1. ctrl+h show the type hierarchy
+2. ctrl+alt+F7 find usages
+3. ctrl+f7 finds the usages in the same file
+4. shift+F6 rename
+5. ctrl+shift+N find file / open resource
+6. ctrl+shift+F10 run (java program)
+7. ctrl+alt+o organize imports
+8. ctrl+F12 show current file structure / outline
+9. ctrl+alt+V create local variable refactoring
+10. sout ctrj+j System.out.println(“”)
+11. ctrl + shift + up/down move lines
+12. ctrl + y delete current line
+13. alt + h show subversion history
+14. ctrl + shift + f search (find in path)
+15. ctrl + shift + enter if I want to add the semi-colon at the end of a statement
+16. ctrl + alt + v introduce local variable
+17. alt + insert generate getters / setters
+18. ctrl + alt + l format code
+19. ctrl + shift + z redo
+20. ctrl + / comment out lines
+21. ctrl + alt + h show call hierarchy
+22. ctrl + alt + f7 to jump to one of the callers of a method
+23. alt + f8 evaluate expression (in debugger)
+24. ctrl + b go to declaration (e.g. go to method)
+25. ctrl + g go to line
+
+========================================================================================================================
+
+
+
 
 

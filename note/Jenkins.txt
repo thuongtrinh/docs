@@ -2,11 +2,11 @@ docker run -d --name jenkins-txt -p 50000:8080 -v $PWD/jenkins:/var/jenkins_home
 
 docker run -d --name jenkins-txt -p 50000:8080 -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker -v $PWD/jenkins:/var/jenkins_home -t jenkins/jenkins
 
-------------
+------------------------------------------------------------------------------------------------
 Main:->
 
 docker run -u 0 --privileged --name jenkins-txt -it -p 50000:8080 -v $PWD/jenkins:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker -t jenkins/jenkins
-------------
+------------------------------------------------------------------------------------------------
 
 -u 0 --privileged
 
@@ -16,14 +16,23 @@ docker run -d --name jenkins-txt -p 8080:8080 -p 50000:50000 -v $PWD/jenkins:/va
 
 docker exec -it -u 0 jenkins-txt bash
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+
+Jenskin account local
+user: thuongtx
+pass: 123457
+E-mail address:	trinhxuan92@gmail.com
+http://localhost:50000/
+
+
+Jenkins URL:	http://13.229.74.65:8080/
 
 Setup plugin:
 Docker plugin
 Docker pipeline
 Github intergration plugin
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 jenkins/jenkins
 
@@ -31,11 +40,11 @@ Web Interface                 http://127.0.0.1:4040
 Forwarding                    http://605b48f9b0db.ngrok.io  -> http://localhost:50000 
 Forwarding                    https://605b48f9b0db.ngrok.io -> http://localhost:50000 
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 lt-win -p 50000
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 Gitlab: https://gitlab.com/thuongtrinh/webhook-1.git
 
@@ -47,30 +56,29 @@ Deploy token connect Jenskin and Gitlab:
 user: gitlab+deploy-token-490355
 pass: MSwfb9JV-CSqBJCjKHUD
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 ngrok authtoken 1uAC6N9aqePCaQ7PYNcj7D0jCLm_5GR3Gm7oYn8n5wfZ1gxQH
 
 C:\Users\admin\Downloads\Program>ngrok authtoken 1uAC6N9aqePCaQ7PYNcj7D0jCLm_5GR3Gm7oYn8n5wfZ1gxQH
 Authtoken saved to configuration file: C:\Users\admin/.ngrok2/ngrok.yml
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 C:\Users\admin\Desktop>lt-win -p 50000
 your url is: https://tough-yak-91.loca.lt
 
-
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 Goto Jenkins Root:
 
 docker exec -u 0 -it jenkins-txt bash
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 failed to solve with frontend dockerfile.v0: failed to read dockerfile: open /var/lib/docker/tmp/buildkit-mount038402221/Dockerfile: no such file or directory
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 1. github-token- for-Jenkins
 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 
@@ -91,7 +99,7 @@ fXyyGsYUM3eMoxcLzQcn
 gitlab-thuongtx
 rdiypAVHJxx2CapoNTyT
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 Run docker jenkins and connect to Docker
 
 start-jenkins-server.sh
@@ -101,7 +109,7 @@ mkdir -p /home/jenkins/data
 cd /home/jenkins
 docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) -v `pwd`/data:/var/jenkins_home  -p 8080:8080  --user 1000:998 --name jenkins-server -d jenkins/jenkins:lts
 
--------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 Server jenkins LINUX EC2-AWS
 
@@ -110,14 +118,5 @@ http://13.229.74.65:8080/login?from=%2F
 /var/jenkins_home/secrets/initialAdminPassword
 baa061418c2f4c5a886604836aa1b559
 
--------------------------------------------------------------
-
-
-
-
-
-
-
-
-
+-------------------------------------------------------------------------------------------------------
 

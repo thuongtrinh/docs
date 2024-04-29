@@ -1,0 +1,49 @@
+<Ctrl> + L: xóa toàn bộ màn hình
+<Ctrl> + D: exit session
+<Ctrl> + R: tìm một lệnh đã chạy trước đây, nhấn <Ctrl> + R sau đó gõ một phần của câu lệnh, hệ thống sẽ tự hoàn tất phần còn lại dựa trên các câu lệnh đã được thử hiện trước đó
+<Tab>: tự động hoàn tất câu lệnh
+<Shift> + <Insert>: dán nội dung đã copy vào terminal
+<Shift> + PageUp, PageDown: Cuộn lên/xuống 1 trang
+
+Ctrl+Shift+C: copy text trong Terminal
+Ctrl+Shift+V: paste đoạn lệnh vô Terminal
+Mũi tên lên hoặc Ctrl+P: 	Hiện lại tất cả các lệnh mà bạn vừa mới nhập vào
+Mũi tên xuống hoặc Ctrl+N: 	Trở lại những lệnh mới nhất
+
+<Ctrl> + A: đưa dấu nhắc về đầu dòng
+<Ctrl> + E: Đưa về cuối dòng
+<Ctrl> + B: di chuyển về phía đầu của từ hiện tại hoặc từ trước (giống phím mũi tên trái)
+<Alt> + F: 	di chuyển vể phía sau (đuôi) 1 từ của dòng lệnh
+<Alt> + B: 	di chuyển vể phía đầu 1 từ của dòng lệnh
+<Ctrl> + K: Xóa dữ liệu kể từ vị trí dấu nhắc cho đến hết dòng
+<Ctrl> + U: Xóa toàn bộ dữ liệu có trong dòng
+<Ctrl> + W: Xóa hết một từ/cụm từ ở phía trước dấu nhắc 
+Ctrl + Shift + '+'  hoặc  Ctrl + '+' 	: Zoom up màn hình terminal
+Ctrl + '-'				: Zoom down màn hình terminal
+E: Chuyển sang ổ đĩa E
+pwd = print working directory
+ls 			:list các file trong directory
+ls -a 		: như ls bao gồm cả file ẩn
+ls -al 		: show list theo dạng list cụ thể từng file và thông tin trên mỗi line	
+man ls 		: xem thông in cụ thể (help) của công cụ (ví dụ đây là ls)
+touch demo1.txt 	: tạo file demo1.txt
+echo hello > demo1.txt 	: ghi nội dung hello vào file demo1.txt (cẩn thận nội dung sẽ bị ghi đè)
+echo world > demo1.txt 	: ghi nối tiếp world>  vào demo1.txt
+less demo1.txt 			: mở file demo1.txt
+cat demo1.txt 			: in nội dung file demo1.txt ra màn hình (nên dùng less)
+mkdir demo 				: tạo thư mục demo
+mv demo1.txt demo2.txt 		: đổi tên file từ demo1.txt -> demo2.txt (tương tự với thư mục)
+cp demo2.txt demo2-copy.txt	: copy file demo2.txt đến demo2-copy.txt (demo2-copy.txt có thể chưa tồn tạo)
+
+cp demoX demoX2		: copy thư mục demoX vào demoX2
+vim demo1.txt		: mở demo1.txt với vim
+:w 			: để ghi tiếp nội dung vừa nhập vào demo1.txt với vim
+:q			: để thoát chế độ vim
+:x			: tương tự :w nhưng ghi xong thì quit khỏi vim
+ifconfig		: ?
+curl			: ?
+whoami			: load tài khoản user nào đang dùng
+top				: xem process đang chạy xem memory
+kill -9 PID		: kill process chương trình đang chạy
+
+i <-> ESC

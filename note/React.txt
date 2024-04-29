@@ -1,0 +1,12 @@
+REACTJS
+
+node -v
+npm -v
+npm start
+
+
+
+
+
+
+

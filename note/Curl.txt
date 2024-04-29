@@ -1,0 +1,35 @@
+Get access token
+curl --request POST 'http://localhost:8080/auth/realms/<realm-name>/protocol/openid-connect/token' \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode 'username=<username>' \
+    --data-urlencode 'password=<password>' \
+    --data-urlencode 'grant_type=password' \
+    --data-urlencode 'client_id=admin-cli'
+
+
+Get users
+ curl --request GET 'http://localhost:8080/auth/admin/realms/<realm-name>/users' \
+        --header 'Authorization: Bearer <access-token>'
+
+
+Create a user
+ curl --request POST 'http://localhost:8080/auth/admin/realms/<realm-name>/users' \
+      --header 'Content-Type: application/json' \
+      --header 'Authorization: Bearer <access-token>' \
+      --data-raw '{"username":"<username>"}'
+
+
+Set user password (use the Get users API to get user id)
+ curl --request PUT 'http://localhost:8080/auth/admin/realms/<realm-name>/users/<user-id>/reset-password'
+       --header "Content-Type: application/json"
+       --header "Authorization: Bearer <access-token>"
+       --data-raw '{"type":"password", "value":"<password>", "temporary": false}'
+
+
+Send verify email. Pre-requisite: Configure Realm Email Settings)
+
+curl --request PUT 'http://localhost:8080/auth/admin/realms/<realm-name>/users/<user-id>/send-verify-email' \
+--header 'Authorization: Bearer <access-token>'
+
+
+

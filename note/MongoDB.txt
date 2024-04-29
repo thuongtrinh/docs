@@ -1,0 +1,419 @@
+
+---------------------------------------------------------------------------------
+-----------------------------MongoDB tutorial------------------------------------
+---------------------------------------------------------------------------------
+1. Basic and data type
+
+Collection = Table
+Document (bản ghi) = Record
+
+-------------------------------------------------------------------------------
+which mongo
+mongo -h
+mongo
+
+sudo systemctl start mongod
+-------------------------------------------------------------------------------
+mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+-------------------------------------------------------------------------------
+
+1. Three methods To list all databases:
+
+show collections
+show tables
+db.getCollectionNames()
+
+2. To list all databases:
+show dbs
+
+3. To enter or use a given database:
+use databasename
+---------------------------------------------------------------------------------
+
+show dbs
+use <db-name>;
+db;
+db.<collection><command>(find, update, insert, updateMany, etc.)
+
+db.createCollection('categoty'); -> Tạo bảng
+db.categoty.remove({ _id: 1});   -> Xóa bản ghi
+
+Ex:
+use shopping-app;  -> tao db shopping-app
+
+db.categoty.insert({"name":"Lap top"})
+db.categoty.insert({"name":"Lap top"})
+db.product.insert({"name":"MacBook Air", "category": ObjectId("60e96b320d3f800a28606365")})
+db.product.insert({"name":"iPad Charger", "category": ObjectId("60e96b770d3f800a28606367")})
+db.product.updateOne({_id: ObjectId("60e96d540d3f800a28606368")}, { $set :{stockQuantity:100} })
+
+db.product.findOne()  		-> Lấy ra product đầu tiên
+db.product.findOne()._id  	-> lấy id của object đầu tiên
+db.product.findOne()._id.getTimestamp()
+
+ObjectId()   -> Tạo một ObjectId mới
+
+db.users.find().pretty()
+
+---------------------------------------------------------------------------------
+5. Import data
+
+Import data from csv 
+mongoimport --type csv -d <db> -c <collection> --headerline --drop /path/to/file.csv
+
+-d <db> : tên database
+-c <collection> : tên collection trong db được import
+--headerline : hàng đầu tiên của data sẽ là tiltle
+--drop /path/to/file.csv : xóa dữ liệu đã có và overivew tất cả data mới vào collection
+
+Ex:
+mongoimport --type csv -d shopping-app -c users --headerline --drop --file D://users.csv
+
+mongoimport --type json -d shopping-app -c pet_owner --drop --file D://ZData//pet-owner.json --jsonArray
+
+mongoimport --type json -d shopping-app -c apartments --drop --file D://ZData//apartments.json --jsonArray
+
+---------------------------------------------------------------------------------
+C:\Program Files\MongoDB\Server\4.4\bin>mongoimport --type csv -d shopping-app -c users --headerline --drop --file D://users.csv
+2021-07-11T00:14:18.165+0700    connected to: mongodb://localhost/
+2021-07-11T00:14:18.166+0700    dropping: shopping-app.users
+2021-07-11T00:14:18.187+0700    20 document(s) imported successfully. 0 document(s) failed to import.
+---------------------------------------------------------------------------------
+
+6. Query data
+db.<collection>.find(query)
+{key: value}
+{key: {$ne: value}}
+{key: {$gt: value}}
+{key: {$gte: value}}
+{key: {$lt: value}}
+{key: {$lte: value}}
+{key: {$in: value}}
+{key: {$nin: value}}
+
+user shopping-app
+db.users.find() 
+db.users.find({username: 'tomjones'})
+db.users.find({age: {$gt: 25} })   		-> age > 25
+db.users.find({age: {$in: [33, 47]} })	-> age from 33 to 47
+db.users.find({email: /\.edu/ })		-> find  theo regular expression (có đuôi .edu)
+db.users.find({email: /\.edu$/ })		-> find  theo regular expression (có đuôi .edu là cuối string)
+db.users.find({ip_address: /^1\./ })	-> ip có địa chỉ bắt đầu là 1
+db.users.find({gender: 'male', age: {$gt: 35}})		-> gender male và age > 35
+
+7. $and và $or
+db.users.find({ $or: [{gender: 'male'}, {age: {$gt: 45}}] })
+
+---------------------------------------------------------------------------------
+8. Nested objects
+9. Array fields
+{
+	_id: ObjectId(...),
+	profile: {
+		city: "Hanoi",
+		work: "XYZ"
+	},
+	language": ["English", "Janpanese", "Vietnamese"]
+}
+
+db.users.find({ "language" : "English"})
+db.users.find({ "language" : {$size: 2} })
+
+db.things.find({ words: { $all: ["text", "here"] }});
+db.things.find({ words: { $in: ["text", "here"] }});
+
+---------------------------------------------------------------------------------
+10. Array of embedded documents
+
+db.pet_owner.find({"pets.type": 13})	-> select tất cả pets có type là 13 của các owner
+
+db.pet_owner.find({"pets.type": 13, "pets.name": /^S/})		-> ít nhất có tồn tại 1 t/h
+db.pet_owner.find($elemMatch: {"pets.type": 13, "pets.name": /^S/})	-> tồn tại đồng thời 2 đkiện cho 1 object
+
+---------------------------------------------------------------------------------
+
+11. Query empty fields
+
+[
+	{
+		"_id" : ObjectId(),
+		"first_name" : "jack",
+		"last_name" : "Hindmore"
+	},
+	{
+		"_id" : ObjectId(),
+		"first_name" : "jack",
+		"last_name" : null
+	}
+]
+
+db.users.find({last_name: null})
+db.users.find({last_name: {$exists: false} })	-> ko có last_name
+
+
+
+---------------------------------------------------------------------------------
+
+12. $where operator (có thể dùng js trong where)
+db.<collection>.find({ $where: "javascript expression" });
+
+Ex: Hai câu query dưới như nhau, câu query 2 truyền vào 1 đoạn code js
+db.users.find({ first_name : "willis"})
+db.users.find({ $where: "this.first_name" === 'Willis' })
+
+db.users.find({ $where: "this.first_name === this.last_name" })  -> user có first_name bằng last_name
+
+---------------------------------------------------------------------------------
+13. Giới thiệu Robo 3T
+Nhấn ctrl + enter -> để query
+
+14. Pagination
+count, skip, limit
+skip: bỏ qua x phần tử đầu tiên
+limit: y phần tử được trả về trả về 
+
+
+db.<collection>.find(query).skip(x).limit(y)
+db.<collection>.count(query)
+
+Ex:
+db.users.find({firstname: 'Jane'})
+
+db.users.count({firstname: 'Jane'})
+db.users.find({firstname: 'Jane'}).count()
+
+db.users.find({firstname: /J./}).limit(4)
+db.users.find({firstname: /J./}).skip(3).limit(10)
+
+---------------------------------------------------------------------------------
+15. Sort
+
+db.<collection>.find(query).sort({ field: -1 })
+db.<collection>.find(query).sort({ field1: -1, field2: 1 })  -> có thể sort theo nhiều trường
+1: ascending order
+-1: descending order
+
+Ex:
+db.getCollection('apartments').find({}).sort({distance_to_school: 1})
+db.apartments.find({}).sort({distance_to_school: 1})
+
+-> 2 câu lệnh trên như nhau: tìm khoản cách đến trường ngắn nhất (bằng cách sort nhỏ -> lớn distance_to_school)
+
+Ex: khoảng cách tăng dần và giá thuê tăng dần (t/h 2 nhà có khoảng cách bằng nhau thì sort tiếp theo giá thuê) 
+db.getCollection('apartments').find({}).sort({distance_to_school: 1, monthly_rent_cost: 1})
+
+---------------------------------------------------------------------------------
+
+16. Update documents
+db.<collection>.updateOne(whatToUpdate, howToUpdate)
+
+whatToUpdate = query object
+howToUpdate = {
+	$set: {
+		"field1.subField1": value
+	}
+}
+
+db.<collection>.updateOne(query, data)
+db.<collection>.updateMany(query, data)
+
+Ex:
+db.users.updateOne({_id: ObjectId("60e9d56a48ec186bd15c1fff")},{
+    $set: {
+        lastname: 'Kate Smith'
+    }
+})
+
+Ex: Note phòng ngừa overivew update -> phương pháp dưới chỉ update 1 field trong object (không xóa các field đã tồn tại)
+db.users.updateOne({_id: ObjectId("60e9d56a48ec186bd15c1ffe")},{
+    $set: {
+        "setting.language":  'jp'
+    }
+})
+
+---------------------------------------------------------------------------------
+
+17. Atomic operators
+$inc, $push, $pull, $addToSet -> ko cho đối tượng bị duplicate khi add
+
+db.posts.update({
+	_id: ObjectId()
+},{
+	viewCount: { $inc: 1},
+	likeBy: { $push: ObjectId() }
+})
+
+------------------------------
+Ex: Tăng viewCount lên 1 đơn vị
+
+db.getCollection('posts').updateOne({
+    _id: ObjectId("60ec6139a7d4b5ed247dc1b0")
+},{
+    $inc: {
+        viewCount: -1
+    }
+})
+
+------------------------------
+
+db.getCollection('posts').updateOne({
+    _id: ObjectId("60ec6139a7d4b5ed247dc1b0")
+},{
+    $push: {
+        likes: ObjectId("60ec6139a7d4b5ed247dc1b0")
+    }
+})
+
+------------------------------
+
+db.getCollection('posts').updateOne({
+    _id: ObjectId("60ec6139a7d4b5ed247dc1b0")
+},{
+    $pull: {
+        likes: ObjectId("60ec6139a7d4b5ed247dc1b0")
+    }
+})
+
+------------------------------
+
+db.getCollection('posts').updateOne({
+    _id: ObjectId("60ec6139a7d4b5ed247dc1b0")
+},{
+    $addToSet: {
+        likes: ObjectId("60ec6139a7d4b5ed247dc1b0")
+    }
+})
+
+---------------------------------------------------------------------------------
+
+18. Delete documents
+deleteOne -> delete chỉ record đầu tiên tìm thấy
+deleteMany -> delete tất cả record tìm thấy
+
+db.getCollection('posts').deleteOne({
+    gender: 'Female'
+})
+
+db.getCollection('posts').deleteMany({
+    gender: 'Female'
+})
+
+---------------------------------------------------------------------------------
+
+19. Collection methods
+
+db.<collection>.drop
+db.<collection>.renameCollection("new name")
+
+Ex:
+db.users.drop()
+db.pet_owner.renameCollection('petOwner')
+
+---------------------------------------------------------------------------------
+
+20. Indexing
+Binary search : Thuật toán này áp dụng cho danh sách đã được sắp xếp tăng dần
+=> Tìm kiếm từ phần tử mốc ở giữa list, nếu phần tử tìm kiếm lớn hơn, nhỏ hơn mốc sẽ tìm kiếm ở nữa còn lại (Rút ngắn time search)
+
+* Khi insert vào MongoDB đánh index cho fields để áp Binary search khi search data, khi đó data sẽ được insert theo thứ tư tăng dần a->z hoặc number...
+
+Ex1: Index
+a@gmail.com
+b@gmail.com
+b@gmail.com
+c@gmail.com
+
+Ex2:
+db.member.createIndex({ email: 1})		-> tạo index cho field email
+
+Mẹo:
+db.member.find({}).sort({ _id: -1 })	-> phần từ cuối trong collection xếp đầu z->a (mẹo get phần từ cuối list)
+
+Get list indexs of collection
+Ex: db.books.getIndexs()
+
+--------------------------------------------------------------------------------
+
+21. Compound index
+db.users.findOne({ age: { $lt: 30 }, yearOfYear: { $gt: 2} })
+
+=> lúc này query trên cần đánh index cho cặp age-yearOfYear để tìm kiếm
+
+Ex:
+db.member.createIndex({ age: 1, yearOfYear: 1 })
+
+
+Note:
+- Khi dùng index thì viết data vào DB chậm hơn, nhưng đọc thì nhanh hơn
+- Quá nhiều index sẽ tốn nhiều RAM của MongoDB server
+
+-----------------------COMMAND CREATE ACCOUNT USER IN MONGODB--------------------
+mongosh --port 27017 -u "root" -p 123456 --authenticationDatabase "admin" 
+
+
+mongo --port 27017 -u "root" -p "123456" --authenticationDatabase "admin"
+---------------------------------------------------------------------------------
+
+22. Unique Indexes trong MogoDB (Bài 9)
+db.collectionName.createIndex({"namecollumn": "value"}, {unique: true});
+
+Ex: db.books.createIndex({"authorId": 100}, {unique: true});
+Ex: db.books.createIndex({"authorId": 100, email: "abc@gmail.com"}, {unique: true});
+
+---------------------------------------------------------------------------------
+
+23. Sparse Indexes trong MongoDB (Bài 10)
+db.books.createIndex({department: 1}, {sparse: true})
+-> Đánh Sparse Indexes để khi query-sort chỉ get records có data
+
+Query
+db.find().sort({department: 1}).hint({department: 1})
+
+-> db.find().sort({department: 1}).hint({department: 1}).explain("executionStats")
+xem số records quét qua để sort
+---------------------------------------------------------------------------------
+24. TTL Indexes trong MongoDB (Bài 11)
+
+db.books.createIndex({"created_date": 1}, {"expireAfterSeconds": 20});
+-> tu xoa record sau 1 khoan tgian
+
+---------------------------------------------------------------------------------
+25. Text Indexes trong MongoDB (Bài 12.2)
+26. Partial Indexes trong MongoDB (Bài 13.1)
+---------------------------------------------------------------------------------
+1. Between:
+{bytesIn: {$gt: 500000, $lt: 700000}}
+
+
+2. Date:
+{startedAt : { $gte : new Date("2017-04-12")}}
+
+3. Date and Time:
+{startedAt : { $gte : new Date("2017-04-12T15:00:00")}}
+
+4. With Timezone
+{startedAt : { $gte : new Date("2017-04-12T15:00:00-07:00")}}
+
+5. Between Two Dates / Times
+{"startedAt":{ $gte: new Date("2017-04-12T15:00:00-07:00"), $lte: new Date("2017-04-12T18:00:00-07:00")}}
+
+6. Last N Days / Weeks / Months / etc
+{"startedAt":{$gte: new Date(Date.now() - 24*60*60 * 1000)}}
+{"startedAt":{$gte: new Date(Date.now() - 5*24*60*60 * 1000)}}
+
+7. Filter on Array (List) Columns
+{"address.coord": {$gt:41}}
+{"address.coord": {$gte:41, $lte:-60}}
+{"address.coord.1": {$gte:40, $lte:41}}
+
+8. Element Match
+{"address.coord":{$elemMatch: {$gte:40, $lte:41}}}
+
+9. mongodb find by multiple array items
+db.things.find({ words: { $all: ["text", "here"] }});
+db.things.find({ words: { $in: ["text", "here"] }});
+
+
+---------------------------------------------------------------------------------
+
+

@@ -1,58 +1,56 @@
+------------------------------------------------Apache Kafka - For windows--------------------------------------------------------------
+
 I. Zookeeper: cd D:\IDE\kafka-groups\apache-zookeeper-3.7.0-bin
 zkserver
 
---------------------------------------------------------------------------------------------------------------
-II. Apache Kafka - For windows
-
--------------------------------------|
 cd D:\IDE\kafka-groups\kafka_2.12-2.8.0
--------------------------------------|
-2. To start Kafka Broker
+
+To start Kafka Broker
 D:\IDE\kafka-groups\kafka_2.12-2.8.0> .\bin\windows\kafka-server-start.bat .\config\server.properties
 
------------------------------------------|
 => cd D:\IDE\kafka-groups\kafka_2.12-2.8.0\bin\windows
------------------------------------------|
-3. To Create topic
+
+1. Create topic
 kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
 
-4. Start Producer
+2. Start Producer
 kafka-console-producer.bat --broker-list localhost:9092 --topic test
 
-5. To create consumer
+3. Create consumer
 kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
 
-6. Topic creation With multi partition with replication factor 1
+4. Topic creation With multi partition with replication factor 1
 kafka-topics --zookeeper localhost:2181 --topic first_topic --create --partitions 3 --replication-factor 1
 
-7. To get the list of topic created in system
+5. Get the list of topic created in system
 kafka-topics --zookeeper localhost:2181 --list
+kafka-topics --bootstrap-server localhost:2181 --list
 
-8. To get the description of topic created in system
+6. Get the description of topic created in system
 kafka-topics.bat --describe --zookeeper localhost:2181 --topic demo
-kafka-topics.bat  –describe  –zookeeper localhost:2181  –topic test
-
+ 
 9. To read message from beginning of topic test created in system(version>2.0)
 kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic filtered --from-beginning
+kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test     --from-beginning
 
 10. To delete topic test created in system
 kafka-run-class.bat kafka.admin.TopicCommand --delete --topic test --zookeeper localhost:2181
 
---------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------Kafka Docker--------------------------------------------------------------
 
-III. Manage & view data inside your Apache Kafka ® cluster
+https://kafka.apache.org/quickstart#quickstart_consume
 
---------------------------|
-cd D:\IDE\kafka-groups\akhq-0.18.0\bin
---------------------------|
+docker exec -it ed13058f4541 /bin/sh
+kafka-topics --create --topic quickstart-events --bootstrap-server localhost:9092
+kafka-topics --describe --topic quickstart-events --bootstrap-server localhost:9092
+kafka-console-producer --topic quickstart-events --bootstrap-server localhost:9092                   -> STEP 4: WRITE
+kafka-console-consumer --topic quickstart-events --from-beginning --bootstrap-server localhost:9092  -> STEP 5: READ THE EVENTS
 
---------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
 
-Start Kafka by docker
+{ \"email\": \"daniel@getarrays.com\", \"profile\": \"https://bootdey.com/img/Content/avatar/avatar1.png\", \"firstName\": \"Daniel\", \"lastName\": \"Craig\", \"phone\": \"4570090332\", \"enabled\": true, \"password\": \"test\", \"userName\": \"txt001\"  }
 
-cd D:\IDE\kafka-groups\docker
+kafka-console-producer --topic approved --bootstrap-server localhost:9092
+kafka-console-consumer --topic approved --from-beginning --bootstrap-server localhost:9092 
 
---------------------------------------------------------------------------------------------------------------
-
-kafka:9092
-
+----------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,27 @@
+ssh-digitalocean-txt01
+
+root
+
+Jenkins-secret
+6e16212faae14be6bd8a08d98c5fb51a
+
+------------------------------------------------
+ifconfig
+------------------------------------------------
+
+vim /lib/systemd/system/docker.service
+ 
+#ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock $OPTIONS $DOCKER_STORAGE_OPTIONS $DOCKER_ADD_RUNTIMES
+ExecStart=/usr/bin/dockerd -H unix://var/run/docker.sock -H tcp://68.183.225.94 --containerd=/run/containerd/containerd.sock $OPTIONS $DOCKER_STORAGE_OPTIONS $DOCKER_ADD_RUNTIMES
+
+systemctl daemon-reload
+systemctl restart docker
+systemctl status docker
+
+------------------------------------------------
+
+Docker plugin
+Docker pipeline
+Github intergration plugin
+Pipeline maven inregartion
+

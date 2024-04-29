@@ -1,0 +1,68 @@
+ng new todo-mvc
+
+npm i bootstrap eva-icons
+
+ng g c components/footer --spec=false
+			 --skipTests=true|false      <- priority because new version	
+
+npm install --save @angular/material @angular/cdk @angular/animations
+
+npm install --save @angular/material @angular/cdk @angular/animations
+
+$ npm install --save angular-in-memory-web-api
+
+ng g c pages/admin/dashboard --skip-Tests --module=app.module
+
+-----------------------------------------------
+Setup NgRx:
+$ npm install @ngrx/store --save
+-----------------------------------------------
+npm uninstall --save-dev angular-cli
+npm install --save-dev @angular/cli@latest
+
+Your existing configuration can be updated automatically by running the following command:
+ng update @angular/cli
+or:
+npm install
+---------------------------------------------
+Fix error:
+module build failed (from ./node_modules/sass-loader/lib/loader.js) angular 8
+Use: => npm install --save-dev --unsafe-perm node-sass
+
+---------------------------------------------
+Install Angular Material
+
+npm install --save @angular/material @angular/cdk 
+
+npm install --save hammerjs 	
+npm install --save @angular/animations 
+
+---------------------------------------------
+
+yarn add bootstrap-grid-only-css --save
+
+npm install bootstrap@next --save
+
+npm install --save bootstrap
+
+---------------------------------------------
+ng serve --port 8084
+---------------------------------------------
+io-ts
+
+npm i io-ts
+npm i ngx-toastr
+---------------------------------------------
+
+TypeError: Cannot create property 'message' on string 'D:\github\springboot-tutorials\spring-boot-social-login\ui-angular-social-login\node_modules\ngx-toastr\fesm2022\ngx-toastr.mjs: 
+This application depends upon a library published using Angular version 17.0.3, which requires Angular version 14.0.0 or newer to work correctly.
+Consider upgrading your application to use a more recent version of Angular.
+
+ncu -u
+---------------------------------------------
+How To Update Angular CLI To Latest Version
+
+yarn upgrade --latest
+yarn install
+---------------------------------------------
+

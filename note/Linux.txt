@@ -1,0 +1,531 @@
+How to add bash auto completion in Ubuntu Linux
+
+- Refresh package database on Ubuntu by running:
+sudo apt update
+
+- Install bash-completion package on Ubuntu by running:
+sudo apt install bash-completion
+
+----------------------------------------------------------------------------------------------------
+
+Truy cấp quyền root trong linux
+sudo su -
+
+chuyển đến tài khoản được tạo
+su - thuongtx
+
+2. Check Linux version current:
+$ uname -r
+
+linux123@
+
+----------------------------------------------------------------------------------------------------
+
+1. Chỉnh không cho phép truy cập từ xa đến server bằng password,...
+vi /etc/ssh/sshd_config
+service sshd restart
+
+B1: goto -> /etc/ssh/
+vi sshd_config
+
+B2: Chỉnh các config
+
+B3:    $ systemctl restart sshd
+/hoặc/ $ service sshd restart
+
+==========================================================================================
+2. Cấp thêm quyền cho một user bằng command:
+$ visudo
+==========================================================================================
+cat /etc/group  => xem các groups 
+==========================================================================================
+
+Check Linux Disk Space Using df Command
+
+df -h
+----------------------------------------------------------------------------------------------------
+
+5. Tạo user/pass cho account linux
+useradd thuongtx
+passwd thuongtx
+
+Ex:
+thuongtx
+123456
+
+6. Tạo public key & private key (cho một user account để kết nối đến server)
+ssh-keygen -t rsa
+cd /home/yuki/.ssh
+mv id_rsa.pub authorized_keys
+chmod 600 authorized_keys
+
+* Copy private key về máy tính: id_rsa.pub = authorized_keys
+
+Lưu ý: Putty vì có sự không tương thích giữa OpenSSH key và Putty key nên trước khi sử dụng cần chuyển đổi đến \id_rsa.ppk 
+
+thgtx.com
+
+----------------------------------------------------------------------------------------------------
+
+0. vi hello.txt -> tạo và ghi file
+   less hello.txt -> đọc file
+
+1. Tạo thư mục  a/b/c
+mrdir -p a/b/c -> tạo nhiều thư mục ví dụ: a,b,c
+
+2. Xóa thư mục hanoi và tất cả data trong thư mục hanoi
+rm -Rf hanoi/
+
+3. Copy toàn bộ file và thư mục trong hanoi -> haiphong (Có tiền tố: -Rf thì mới copy cả thư mục và file)
+cp -Rf hanoi/* haiphong/*
+
+3.1 cp -rf hanoi haiphong/   -> Copy thư mục "hanoi" vào thư mục "haiphong" 
+
+4. Lệnh liệt kê tất cả những gì mình đã làm
+history
+history | less
+
+----------------------------------------------------------------------------------------------------
+
+7. Cú pháp lệnh userdel
+
+userdel USERNAME
+
+userdel -r username
+sudo killall -u username
+userdel -f username
+
+* Để xóa người dùng bằng lệnh userdel, bạn cần phải đăng nhập bằng root hoặc người dùng có quyền truy cập sudo .
+
+su userdel bao  -> xóa user bao login bang user thuongtx (nhớ có sudo phía trước)
+
+Xóa user:
+userdel -rf username
+
+Nhớ xóa: 
+rm -rf  /home/thuongtx
+rm -rf  /var/spool/mail/thuongtx
+
+
+(hoac: rm -r -f thuongtx)
+userdel: thuongtx mail spool (/var/spool/mail/thuongtx) not found
+userdel: thuongtx home directory (/home/thuongtx) not found
+----------------------------------------------------------------------------------------------------
+- Get a List of All Users using list file:
+$ less /etc/passwd
+
+- Get a List of all Users using the getent Command 
+$ getent passwd
+
+- Display only the username you can use commands: awk / cut  
+$ awk -F: '{ print $1}' /etc/passwd
+$ cut -d: -f1 /etc/passwd
+
+- Check whether a user exists in the Linux system
+$ getent passwd | grep jack
+
+or:
+$ getent passwd jack
+
+- Find out how many users accounts you have on your system, pipe the getent passwd output to the wc command:
+$ getent passwd | wc -l
+
+- To check the UID_MIN and UID_MAX values on your system, you can use the following command:
+$ grep -E '^UID_MIN|^UID_MAX' /etc/login.defs
+
+- List all normal users in our Linux system:
+$ getent passwd {1000..60000}
+
+-Your system UID_MIN and UID_MIN values may be different so the more generic version of the command above would be:
+$ eval getent passwd {$(awk '/^UID_MIN/ {print $2}' /etc/login.defs)..$(awk '/^UID_MAX/ {print $2}' /etc/login.defs)}
+
+- If you want to print only the usernames just pipe the output to the cut command:
+$ eval getent passwd {$(awk '/^UID_MIN/ {print $2}' /etc/login.defs)..$(awk '/^UID_MAX/ {print $2}' /etc/login.defs)} | cut -d: -f1
+
+
+
+----------------------------------------------------------------------------------------------------
+
+usermod: cannot open /etc/shadow 
+=> Ok, this fixed it:
+
+root@debian:~# chattr -a /etc/passwd
+root@debian:~# chattr -a /etc/shadow
+
+----------------------------------------------------------------------------------------------------
+- Liệt kê tất cả các groups
+less /etc/group
+
+-Tạo user/group và phân quyền file và folder trên AWS EC2 Linux
++ Tạo user
+useradd bao
+passwd bao
+
++ Tạo group
+groupadd ketoan
+groupadd nhansu
+
+-Thêm user vào group
+usermod -a -G <groupname> <username>
+Ex: usermod -a -G ketoan bao
+
+- Kiểm tra thêm user có nằm trong group chưa
+id <username>
+
+- Kiểm tra permission hiện tại: ls -la
+
+- Rule permission:
+d rwx r-x r-x
+
+d: directory
+rwx: user
+r-x: group
+r-x: các quyền public
+
+- Set quyền cho file và folder
+chmod [quyền][tên file hoặc thư mục]
+ví dụ: chmod -Rf 777 <ketoan>
+ -Rf -> có nghĩa change quyền full các file / thư mục con bên trong
+
+- Gán quyền của group vào trong folder-data
+ex2: chown -Rf root:ketoan ketoan-data/
+     chown -Rf :ketoan ketoan-data/
+
+- Gán quyền (sở hữu) cho user vào trong group/thu muc
+chown [ten user]:[ten nhom] [ten file hoac thu muc]
+vd: chown -Rf bao:ketoan ketoan-data/
+
+-Thay đổi người dùng chủ sở hữu của một tập tin hoặc thư mục:
+chown user file
+
+vd: chown bao /var/www/bao  => set quyen bao cho thu muc bao
+
+-Thay đổi người dùng chủ sở hữu và nhóm của một tập tin hoặc thư mục:
+chown user:group file
+
+-Thay đổi đệ quy chủ sở hữu của một thư mục và tất cả nội dung bên trong của nó:
+chown -R user folder
+
+-Thay đổi chủ sở hữu của một tập tin hoặc thư mục:
+chgrp group file
+ex: chgrp root test01
+
+----------------------------------------------------------------------------------------------------
+
+Tin học thật là đơn giản 
+Bạn có thể dùng cú pháp này để chỉ cho phép user login vào FTP
+usermod -s /sbin/nologin username
+------------------------------------------------------------------------------------------------------------
+
+1. Cài đặt FTP
+yum -y install vsftpd
+
+2. Thêm các dòng lệnh sau vào /etc/vsftpd/vsftpd.conf
+pam_service_name=vsftpd
+userlist_enable=YES
+tcp_wrappers=NO
+pasv_enable=YES
+pasv_address=18.136.200.90
+pasv_min_port=60001
+pasv_max_port=60010
+force_dot_files=YES
+use_localtime=YES
+allow_writeable_chroot=YES
+listen=YES
+listen_ipv6=NO
+pasv_addr_resolve=NO
+
+3. Bỏ các comment sau trong /etc/vsftpd/vsftpd.conf
+- Bỏ comment
+chroot_local_user=NO
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd/chroot_list
+
+Thêm dòng
+user_config_dir=/etc/vsftpd/user_conf
+
+* Test thử chạy chưa?
+=> service vsftpd start
+telnet localhost 21
+quit
+
+4. edit file sau và thêm vào user ftp-user
+vi /etc/vsftpd/chroot_list
+frp-user
+bao
+
+-> đặt các username vào file này
+
+5. Tạo thư mục
+mkdir /etc/vsftpd/user_conf
+
+6. Tạo file /etc/vsftpd/user_conf/<username>
+vi /etc/vsftpd/user_conf/bao
+
+7. Điền nội dung vào file -> /etc/vsftpd/user_conf/bao
+local_root=/var/www/bao
+
+8. Cấp quyền
+mkdir -p  /var/www/bao
+chown bao /var/www/bao   -> Gán user cho folder
+chmod 775 /var/www/bao
+=> service vsftpd restart
+
+9. Mởi port 21, 60001-60010 trên Firewall của AWS
+
+10. Test kết nối
+   Mở Winscp test login FTP với user bao
+
+----------------------------------------------------------------------------------------------------
+cat credentials  
+cat config
+tree
+----------------------------------------------------------------------------------------------------
+
+###Command about nginx:
+
+- cho nginx vào startup
+systemctl enable nginx.service
+
+- Star nginx
+systemctl start nginx.service
+
+Win:
+start nginx               # bật nginx
+nginx -s stop             # tắt nginx
+nginx -s reload           # tải lại cấu hình nginx (khi file cấu hình thay đổi và bạn muốn apply sự thay đổi đó luôn)
+
+Linux:
+service nginx status
+
+sudo systemctl start nginx 
+sudo systemctl stop nginx 
+sudo systemctl restart nginx
+
+ym -y update
+
+--------------------------------------------JDK in linux-------------------------------------------------------
+
+vi /etc/profile
+
+# OpenJDK 16
+JAVA_HOME=/usr/java/openjdk/jdk-16.0.1
+PATH=$PATH:$HOME/bin:$JAVA_HOME/bin
+export JAVA_HOME
+export PATH
+
+*If JDK is not installed on your system, use the below-mentioned commands to configure the java commands.
+sudo update-alternatives --install "/usr/bin/java" "java" "/usr/java/openjdk/jdk-16.0.1/bin/java" 1
+
+--------------------------------------------------------------------------------------------------------------
+How to Find if Linux is Running on 32-bit or 64-bit
+
+uname -a 
+uname -m 
+arch
+
+---------------------------------------------------------------------------------------------------
+
+16 Commands to Check Hardware Information on Linux
+lscpu
+free -m
+cat /proc/cpuinfo
+cat /proc/meminfo
+
+---------------------------------------------------------------------------------------------------
+
+How to check remaining space in storage device EC2
+df -hT /dev/xvda1
+
+---------------------------------------------------------------------------------------------------
+
+psql --version
+
+yum -y install telnet
+
+su - postgres
+
+psql postgres
+\l  -> hiển thị tất cả các database
+
+CREATE DATABASE employeemanager;
+
+vị trí: postgresql.conf  
+/var/lib/pgsql/13/data
+
+1. postgresql.conf
+listen_addresses = '*'
+uncomment this line and change localhost to *
+
+2. pg_hba.conf
+host    all             all             0.0.0.0/0
+
+sudo systemctl restart postgresql-13.service   -> restart postgresql
+sudo systemctl status postgresql-13.service    -> check status
+hoac: service  postgresql-13  status
+
+ALTER USER postgres PASSWORD '123456';   -> thay đổi pass default
+
+---------------------------------------------------------------------------------------------------
+
+172-31-15-118
+
+ALTER USER postgres PASSWORD '123456';
+
+curl -X GET \
+  -H "Content-type: application/json" \
+  -H "Accept: application/json" \
+  "http://52.77.221.165:8180/employee/all"
+
+---------------------------------------------------------------------------------------------------
+
+ng build
+/usr/share/nginx/html/employee-app
+
+---------------------------------------------------------------------------------------------------
+
+Tự động cài web server khi tạo EC2
+
+#!/bin/bash
+yum update -y
+yum install httpd -y
+chkconfig httpd on
+service httpd start
+cd /var/www/html
+echo "Hello Tin Hoc That La Don Gian" } index.html
+
+-----------------------------------------------------------------------------------------------------------------
+
+authorized_keys  id_rsa
+
+3. Creating ssh key
+$ sudo su - www-user
+$ ssh-keygen -t rsa
+$ cd /home/www-user/.ssh/
+$ mv id_rsa.pub  
+
+4. Copy private key to Jenkin server
+cd /home
+mkdir jenkins
+vi web-key.pem
+chown -Rf jenkins:root
+chmod 400 web-key.pem
+
+- Test connect to web server
+vi /etc/passwd
+jenkins:x:996:994:Jenkins Automation Server:/var/lib/jenkins:/bin/bash
+su - jenkins
+ssh www-user@[Web Server Address] -i /home/jenkins/web-key.pem 
+
+5. Github configuration
+Webhook
+http://[Jenkin URL]:8080/github-webhook/ 
+
+6. Jenkins configuration
+6.1 Git configuration
+
+6.2 Build Triggers
+Check on "GitHub hook trigger for GITScm polling"
+
+6.3 Build 
+Execute shell
+
+#!/bin/bash
+ssh -T -i /home/jenkins/web-key.pem www-user@[Web Server Address] << EOF
+cd /var/www/html/tinhocthatladongian
+git pull
+EOF
+
+-----------------------------------------------------------------------------------------------------------------
+
+open the script in /etc/sudoers   -> sudo visudo
+
+$ sudo visudo
+## Now add the below lines in your sudoers file :
+jenkins ALL=(ALL) NOPASSWD: ALL
+
+$service jenkins start
+
+-----------------------------------------------------------------------------------------------------------------
+sudo su
+mkdir Day15
+cd Day15
+pwd 
+touch Day15
+
+locate Day15
+sudo updatedb
+sudo apt install mlocate
+
+mv Day15 90DaysOfDevOps
+rm AnotherDay 
+rm -R -f
+
+cp Day15 Desktop
+
+echo "Xin chào #90DaysOfDevOps" > Day15
+echo "Commands are fun!" >> Day15
+cat Day15 | grep "#90DaysOfDevOps"
+
+passwd
+
+history 
+history -p PASSWORD
+history | grep "Command"
+
+sudo useradd NewUser
+sudo passwd NewUser
+
+sudo groupadd DevOps
+sudo usermod NewUser -a -G DevOps
+usermod -a -G sudo NewUser 
+
+0 = None ---
+1 = Execute only --X
+2 = Write only -W-
+3 = Write & Execute -WX
+4 = Read Only R--
+5 = Read & Execute R-X
+6 = Read & Write RW-
+7 = Read, Write & Execute RWX
+
+User - Group - Everyone(Người dùng - Nhóm - Mọi người)
+Ex: 777; 775 
+
+ls -al Day15
+chmod 750 Day15
+sudo chown NewUser Day15
+
+who | awk '{print $1}'
+
+xargs 
+cut -d: -f1 < /etc/passwd
+cut -d: -f1 < /etc/passwd | sort | xargs
+
+sudo apt-get update
+sudo apt install figlet
+sudo apt remove figlet
+sudo apt install vagrant
+
+Lưu trữ (Storage)
+lsblk 
+df -h
+sudo mkfs -t ext4 /dev/sdb
+
+sudo mkdir NewDisk
+sudo mount /dev/sdb newdisk
+sudo umount /dev/sdb
+
+SSH 
+sudo apt install OpenSSH-server
+sudo ufw allow ssh
+
+ssh-keygen -t ed25519
+C:\Users\micha/.ssh/
+ssh-copy-id vagrant@192.168.169.135
+ssh vagrant@192.168.169.135
+sudo nano /etc/ssh/sshd_config
+sudo systemctl reload sshd
+
+
+

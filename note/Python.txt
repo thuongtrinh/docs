@@ -1,0 +1,10 @@
+numpy setup:
+py -3 -m  pip install numpy
+
+
+
+
+
+
+
+

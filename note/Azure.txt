@@ -1,0 +1,93 @@
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void moveFileBetweenAzureBlob(String blobNameSource, String blobNameTarget) {
+//        String connectStr = "source storage account connection string";
+//        String destconnectStr = "destination storage account connection string";
+
+        // Create a BlobServiceClient object which will be used to create a container client
+//        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
+//        BlobServiceClient destblobServiceClient = new BlobServiceClientBuilder().connectionString(destconnectStr).buildClient();
+//        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient("test");
+//        BlobContainerClient destcontainer=destblobServiceClient.getBlobContainerClient("destcontainer");
+
+        //containerClient
+//        ListBlobsOptions options = new ListBlobsOptions();
+//        PagedIterable<BlobItem> blobs = blobContainerClient.listBlobs();//lobsByHierarchy(Constant.AZURE_PATH.PC_IMPORTDATA);
+//        for (BlobItem blobItem : blobs) {
+//            log.info("This is the blob name - {}", blobItem.getName());
+
+//            if(blobItem.getName().equals(blobNameSource)) {
+                BlobClient blobClient = blobContainerClient.getBlobClient(blobNameSource);
+                if(blobClient != null && blobClient.exists()) {
+                    log.info("This is the blob name - {}", blobClient.getBlobName());
+
+                    BlobClient destblobclient = blobContainerClient.getBlobClient(blobNameTarget);
+                    destblobclient.beginCopy(blobClient.getBlobUrl(), null);
+                    blobClient.deleteIfExists();
+                }
+//            }
+//        }
+    }
+
+-------------------------------------------------BLOB PROPERTIES-------------------------------------------------------------------------------
+
+
+blobClient = {BlobClient@11908} 
+ client = {BlobAsyncClient@11912} 
+  blockBlobAsyncClient = null
+  appendBlobAsyncClient = null
+  pageBlobAsyncClient = null
+  azureBlobStorage = {AzureBlobStorageImpl@11913} 
+   url = "https://pushstore.blob.core.windows.net"
+   version = "2021-10-04"
+   httpPipeline = {HttpPipeline@11921} 
+   serializerAdapter = {JacksonAdapter@11922} 
+   services = {ServicesImpl@11923} 
+   containers = {ContainersImpl@11924} 
+   blobs = {BlobsImpl@11925} 
+   pageBlobs = {PageBlobsImpl@11926} 
+   appendBlobs = {AppendBlobsImpl@11927} 
+   blockBlobs = {BlockBlobsImpl@11928} 
+  snapshot = null
+  versionId = null
+  customerProvidedKey = null
+  encryptionScope = null
+  accountName = "pushstore"
+  containerName = "pulseops"
+  blobName = ""
+  serviceVersion = {BlobServiceVersion@11915} "V2021_10_04"
+ blockBlobClient = null
+ appendBlobClient = null
+ pageBlobClient = null
+ BlobClientBase.client = {BlobAsyncClient@11912} 
+  blockBlobAsyncClient = null
+  appendBlobAsyncClient = null
+  pageBlobAsyncClient = null
+  azureBlobStorage = {AzureBlobStorageImpl@11913} 
+   url = "https://pushstore.blob.core.windows.net"
+   version = "2021-10-04"
+   httpPipeline = {HttpPipeline@11921} 
+   serializerAdapter = {JacksonAdapter@11922} 
+   services = {ServicesImpl@11923} 
+   containers = {ContainersImpl@11924} 
+   blobs = {BlobsImpl@11925} 
+   pageBlobs = {PageBlobsImpl@11926} 
+   appendBlobs = {AppendBlobsImpl@11927} 
+   blockBlobs = {BlockBlobsImpl@11928} 
+  snapshot = null
+  versionId = null
+  customerProvidedKey = null
+  encryptionScope = null
+  accountName = "pushstore"
+  containerName = "pulseops"
+  blobName = ""
+  serviceVersion = {BlobServiceVersion@11915} "V2021_10_04"
+   version = "2021-10-04"
+   name = "V2021_10_04"
+   ordinal = 13
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+

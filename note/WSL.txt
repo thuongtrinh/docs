@@ -1,0 +1,110 @@
+Quản trị Windows
+
+# Enable WSL - Kích hoạt tính năng Windows Subsystem for Linux
+$ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all
+
+# Tải về Distro Linux muốn cài ->   https://aka.ms/wslstore
+
+# Liệt kê danh sách các distro được cài đặt
+wsl -l -all
+
+# Liệt kê danh sách các distro đang chạy
+wsl -l --running
+
+# Chạy và vào ngay dòng lệnh của Distro mặc định
+wsl
+
+# Windows gọi lệnh Linux
+wsl lenh-linux cac-tham-so
+Ex: wsl nano 1.txt
+
+# Kiểm tra Distro đang chạy ở version nào
+
+wsl --list --verbose
+
+# ping của linux
+wsl ping google.com
+
+# cd vào ổ c hđh win từ linux
+cd /mnt/c/
+
+Đường dẫn của ổ C:/ trên Windows được mount và Linux theo đường dẫn /mnt/c/, 
+như vậy để truy cập đến file C:\Users\admin\1.txt của Windows 
+thì tương ứng trên Linux là /mnt/c/Users/admin/1.txt
+
+# Ngoài ra bạn có thể duyệt hệ thống file của Ubuntu từ File Explore, tại địa chỉ \\wsl$\Ubuntu
+\\wsl$\Ubuntu-20.04
+
+# Sau khi cập nhật, vào địa chỉ wsl2-kernel, tải về WSL2 Linux kernel update package, sau đó chạy để cập nhật, rồi chạy lệnh sau để chuyển mặc định WSL2
+wsl --set-default-version 2
+
+# Kiểm tra Distro đang chạy ở version nào (-> kiểm tra phiên bản ubuntu đang chạy)
+wsl --list --verbose
+
+# Convert Distro từ version 1 sang version 2 : ví dụ convert ubuntu
+wsl --set-version ubuntu 2
+
+----------------------------------------------------------------------------------------------------
+winget search visual
+
+Cài đặt ứng dụng bằng winget
+winget install Microsoft.VisualStudioCode
+
+----------------------------------------------------------------------------------------------------
+ssh-keygen -t rsa
+
+----------------------------------------------------------------------------------------------------
+
+# Trên Windows thì gõ trong PowerShell
+$env:Path
+
+----------------------------------------------------------------------------------------------------
+
+Check win bản quyền hay ko:
+SLMGR/XPR
+
+----------------------------------------------------------------------------------------------------
+
+Check port
+
+1. CMD as run as administrator
+2. Enter netstat -a -o -n
+
+3. Termial program is running by port: select the process id(not port) that your port running and type 
+taskkill /F /PID <process_id_here>
+
+----------------------------------------------------------------------------------------------------
+
+command download file in windown:
+
+wsl wget -o docker-compose.yml https://raw.githubusercontent.com/tchiotludo/akhq/master/docker-compose.yml
+
+----------------------------------------------------------------------------------------------------
+
+cd D:\IDE\kafka-groups\docker
+docker-compose up
+
+----------------------------------------------------------------------------------------------------
+attrib +h +s +r xxx
+attrib -h -s -r xxx
+----------------------------------------------------------------------------------------------------
+Mở cổng 22 OpenSSH:
+
+
+ECHO OFF
+set PORT=22
+set RULE_NAME="Open Port %PORT%"
+
+netsh advfirewall firewall show rule name=%RULE_NAME% >nul
+if not ERRORLEVEL 1 (
+    rem Rule %RULE_NAME% already exists.
+    echo Hey, you already got a out rule by that name, you cannot put another one in!
+) else (
+    echo Rule %RULE_NAME% does not exist. Creating...
+    netsh advfirewall firewall add rule name=%RULE_NAME% dir=in action=allow protocol=TCP localport=%PORT%
+)
+
+----------------------------------------------------------------------------------------------------
+

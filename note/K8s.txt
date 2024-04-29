@@ -9,6 +9,8 @@ kubectl get nodes
 
 1330-1544-4195-8131-3034-5634
 
+kubectl config get-contexts
+
 -------------------------------------------------------------
 
 K01 - Giới thiệu và cài đặt Kubernetes Cluster
@@ -48,7 +50,7 @@ kubeadm init --apiserver-advertise-address=172.23.52.134 --pod-network-cidr=192.
 
 // kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
 kubectl apply -f https://docs.projectcalico.org/v3.10/manifests/calico.yaml
- 
+
 3. Xin kết nối Node vào Cluster (worker xin vào master)
 kubeadm token create --print-join-command
 
@@ -242,13 +244,13 @@ kubectl edit pod/mypod
 kubectl logs pod/mypod
 
 8. Thi hành lệnh trong container của một pod
-kubectl exec ungdungnode ls /
+kubectl exec [pod-name] ls /
 
 9. Thi hành lệnh vào terminal của container trong pod
-kubectl exec -it tools bash
+kubectl exec -it [pod-name] bash
 
 * Nếu pod có nhiều container thì phải chỉ ra tên container cho bash
-kubectl exec -it tools -c my-container bash
+kubectl exec -it [pod-name] -c my-container bash
 
 * Mỗi pod đang chạy có một ip, nó là ip trong mạng nội bộ của cluster 
 Nên từ trong container của pod này có thể ping đến pod khác
@@ -266,7 +268,6 @@ kubectl proxy
 http://localhost:8001/api/v1/namespaces/default/pods/nginxapp/proxy/
 http://localhost:8001/api/v1/namespaces/default/pods/ungdungnode/proxy/
 http://localhost:8001/api/v1/namespaces/default/pods/nginx-swarmtest:8085/proxy/
-...
 
 -------------------------------------------------------------
 
@@ -374,7 +375,7 @@ kubectl get deploy -o yaml
 kubectl get rs -o wide
 
 4. Đến lượt ReplicaSet do Deploy quản lý lại thực hiện quản lý (tạo, xóa) các Pod, để xem các Pod
-kubeclt get po -o wide
+kubectl get po -o wide
 
 # Hoặc lọc cả label
 kubectl get po -l "app=deployapp" -o wide
@@ -407,11 +408,11 @@ K09 - Triển khai Metrics Server trên Kubernetes
 
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
 
-        args:
-          - --cert-dir=/tmp
-          - --secure-port=4443
-          - --kubelet-insecure-tls
-          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+args:
+  - --cert-dir=/tmp
+  - --secure-port=4443
+  - --kubelet-insecure-tls
+  - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
 
 - Sửa file components.yml như trên rồi thực hiện lệnh:
 kubectl apply -f components.yml
@@ -459,10 +460,16 @@ kubectl create secret tls secret-nginx-cert --cert=certs/tls.crt  --key=certs/tl
 
 - Secret này tạo ra thì mặc định nó đặt tên file là tls.crt và tls.key có thể xem với lệnh
 kubectl describe secret/secret-nginx-cert
-
+kubectl describe secret mongodb
 
 # Show các secret
 kubectl get secret -o wide 
+
+
+# see the base64 encoded secret data.
+kubectl get secret mongodb -o yaml
+echo "UGlvdF8xMjM=" | base64 --decode
+echo "cGlvdHI=" | base64 --decode
 
 -------------------------------------------------------------
 
@@ -535,7 +542,7 @@ systemctl start nfs-server
 systemctl start nfs-lock
 systemctl start nfs-idmap
 
-ạo (mở) file /etc/exports để soạn thảo, ở đây sẽ cấu hình để chia sẻ thư mục /data/mydata/
+Tạo (mở) file /etc/exports để soạn thảo, ở đây sẽ cấu hình để chia sẻ thư mục /data/mydata/
 
 vi /etc/exports
 /data/mydata  *(rw,sync,no_subtree_check,insecure)
@@ -599,8 +606,6 @@ kubectl get all -n ingress-controller
 
 kubectl get ingress -n ingress-controller
 
-
-
 #C:\Windows\System32\drivers\etc\hosts
 
 -------------------------------------------------------------
@@ -613,5 +618,34 @@ docker run -d --restart=unless-stopped -p 80:80 -p 443:443  --privileged rancher
 
 -------------------------------------------------------------
 
+http://microservices.info/department/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/
+/department/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/
+
+-------------------------------------------------------------
+
+minikube delete --all --purge
+
+minikube version
+
+minikube start --vm-driver=virtualbox
+
+minikube start
+minikube stop
+minikube delete
+ 
+minikube addons enable ingress
+
+minikube service list
+minikube service department
+minikube service department --url
+
+-------------------------------------------------------------
+
+if you are using Windows machine and Chocolatey package manager -
+
+Step 1: run PowerShell as administrator
+
+Step 2: run following command choco upgrade minikube
 
 
+-------------------------------------------------------------

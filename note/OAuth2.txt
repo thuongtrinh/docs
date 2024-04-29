@@ -1,0 +1,162 @@
+Mục tiêu năm nay:
+Devops
+Ng,React
+Python
+Deep Java
+
+
+-- used in tests that use HSQL
+create table oauth_client_details (
+  client_id VARCHAR(256) PRIMARY KEY,
+  resource_ids VARCHAR(256),
+  client_secret VARCHAR(256),
+  scope VARCHAR(256),
+  authorized_grant_types VARCHAR(256),
+  web_server_redirect_uri VARCHAR(256),
+  authorities VARCHAR(256),
+  access_token_validity INTEGER,
+  refresh_token_validity INTEGER,
+  additional_information VARCHAR(4096),
+  autoapprove VARCHAR(256)
+);
+
+create table oauth_client_token (
+  token_id VARCHAR(256),
+  token LONGVARBINARY,
+  authentication_id VARCHAR(256) PRIMARY KEY,
+  user_name VARCHAR(256),
+  client_id VARCHAR(256)
+);
+
+create table oauth_access_token (
+  token_id VARCHAR(256),
+  token LONGVARBINARY,
+  authentication_id VARCHAR(256) PRIMARY KEY,
+  user_name VARCHAR(256),
+  client_id VARCHAR(256),
+  authentication LONGVARBINARY,
+  refresh_token VARCHAR(256)
+);
+
+create table oauth_refresh_token (
+  token_id VARCHAR(256),
+  token BYTEA,
+  authentication BYTEA
+);
+
+create table oauth_code (
+  code VARCHAR(256), authentication LONGVARBINARY
+);
+
+create table oauth_approvals (
+	userId VARCHAR(256),
+	clientId VARCHAR(256),
+	scope VARCHAR(256),
+	status VARCHAR(10),
+	expiresAt TIMESTAMP,
+	lastModifiedAt TIMESTAMP
+);
+
+
+-- customized oauth_client_details table
+create table ClientDetails (
+  appId VARCHAR(256) PRIMARY KEY,
+  resourceIds VARCHAR(256),
+  appSecret VARCHAR(256),
+  scope VARCHAR(256),
+  grantTypes VARCHAR(256),
+  redirectUrl VARCHAR(256),
+  authorities VARCHAR(256),
+  access_token_validity INTEGER,
+  refresh_token_validity INTEGER,
+  additionalInformation VARCHAR(4096),
+  autoApproveScopes VARCHAR(256)
+);
+
+--------------------------------------------------------------------------------------------------------------------
+OAuth2 có 4 loại định danh chính:
+- Authorization Code
+- Implicit
+- Resource Owner Password Credentials
+- Client Credentials
+
+1. Authorization Code - (grant_type = authorization_code)
+
+The user authorizes the client the first time it wants to access resources. In exchange it gets a code to get tokens from the /token endpoint. Only for trusted clients. The client must have some storage to keep the token.
+
+The client uses the /oauth/authorize?client_id=$clientId&response_type=code&redirect_uri=$uri endpoint to get the code. After the user authorizes the client the oauth server will return a redirect to $uri with the code in the hash of the redirect location.
+
+The code can then be used at /oauth/token?code=$code&grant_type=authorization_code to obtain a token with it. The client has to authenticate itself with basic authentication at this point (with its name and the client secret, even when the client_secret grant is not used!)
+
+refresh_token
+password
+The client asks the user for his credentials and forwards them. Only for clients that you wrote yourself like an official app for a phone.
+
+2. Implicit (The Implicit grant type was created for JavaScript apps) 
+The client gets a token directly after the user authorizes it. Clients using this should have a rather limited scope.
+
+The client uses the /oauth/authorize?client_id=$clientId&response_type=token&redirect_uri=$uri endpoint to get the code. After the user authorizes the client the oauth server will return a redirect to $uri with the token in the hash of the redirect location.
+
+3. Resource Owner Password Credentials (grant_type = password)
+
+4. Client Credentials (grant_type = client_credentials)
+The client can get an access token without the user authorizing it from the /token endpoint using basic authentication with its id and secret. Only for trusted clients. See curl client example. The client secret must be set for this grant type. The admin can specify the roles the client will have on the resource servers.
+
+5. Refresh Token Grant - (grant_type = refresh_token)
+
+
+
+
+You could imagine a client script with an admin role but only read scope that runs on a trusted server of you and pulls some data periodically.
+
+
+D:\CODE-GITHUB\1.tutorials-master(baeldung of eugenp)
+
+
+oauth_client_token
+oauth_client_details
+oauth_access_token
+oauth_refresh_token
+authority
+credentials
+credentials_authorities
+oauth_code
+oauth_approvals
+
+authorization_code,check_token,refresh_token,password
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	http.authorizeRequests(authz -> authz.antMatchers(HttpMethod.GET, "/bars/**")
+		.hasAuthority("SCOPE_read")
+		.antMatchers(HttpMethod.POST, "/bars")
+		.hasAuthority("SCOPE_write")
+		.anyRequest()
+		.authenticated())
+		.oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(token -> token.introspectionUri(this.introspectionUri)
+			.introspectionClientCredentials(this.clientId, this.clientSecret)));
+	return http.build();
+}
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	http.authorizeRequests(authz -> authz.antMatchers(HttpMethod.GET, "/foos/**")
+		.hasAuthority("SCOPE_read")
+		.antMatchers(HttpMethod.POST, "/foos")
+		.hasAuthority("SCOPE_write")
+		.anyRequest()
+		.authenticated())
+		.oauth2ResourceServer(oauth2 -> oauth2.jwt());
+	return http.build();
+}
+
+
+http://localhost:8083/auth/realms/syspro/protocol/openid-connect/auth?response_type=code&client_id=ssoClient-1&scope=read%20write&state=nEIUsAct6trZ-n7c6yqVrzIs5krM39RLw51pJ90hVBM%3D&redirect_uri=http://localhost:8082/ui-one/login/oauth2/code/custom
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+

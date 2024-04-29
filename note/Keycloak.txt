@@ -1,0 +1,71 @@
+D:/github/springboot-tutorials/spring-boot-security/spring-authorization-server/src/main/resources/keys
+
+
+------------------------------------------------------------------------
+name: db-postgresql
+
+postgresql://postgres:123456@localhost:5432/sysperson
+jdbc:postgresql://localhost:5432/sysperson
+jdbc:postgresql:sysperson
+
+org.postgresql.Driver
+
+postgres
+123456
+------------------------------------------------------------------------
+
+jdbc:postgresql://localhost:5432/authserverdb
+jdbc:postgresql:authserverdb
+
+authserverdb
+jdbc:postgresql:authserverdb
+
+------------------------------------------------------------------------
+
+org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.default_schema: authserverdb
+
+------------------------------------------------------------------------------------
+
+"default": {
+            "url": "${keycloak.connectionsJpa.url:jdbc:h2:mem:test;DB_CLOSE_DELAY=-1}",
+            "driver": "${keycloak.connectionsJpa.driver:org.h2.Driver}",
+            "driverDialect": "${keycloak.connectionsJpa.driverDialect:}",
+            "user": "${keycloak.connectionsJpa.user:sa}",
+            "password": "${keycloak.connectionsJpa.password:}",
+            "showSql": "${keycloak.connectionsJpa.showSql:}",
+            "formatSql": "${keycloak.connectionsJpa.formatSql:}",
+            "globalStatsInterval": "${keycloak.connectionsJpa.globalStatsInterval:}"
+        }
+
+
+------------------------------------------------------------------------------------
+"default": {
+      "url": "${keycloak.connectionsJpa.url:jdbc:postgresql:authserverdb;DB_CLOSE_DELAY=-1}",
+      "driver": "${keycloak.connectionsJpa.driver:org.postgresql.Driver}",
+      "driverDialect": "${keycloak.connectionsJpa.driverDialect:}",
+      "user": "${keycloak.connectionsJpa.user:postgres}",
+      "password": "${keycloak.connectionsJpa.password:123456}",
+      "showSql": "${keycloak.connectionsJpa.showSql:}",
+      "formatSql": "${keycloak.connectionsJpa.formatSql:}",
+      "globalStatsInterval": "${keycloak.connectionsJpa.globalStatsInterval:}"
+    }
+
+
+class 
+com.txt.keycloak.authserver.config.SimplePlatformProvider cannot be cast to class 
+com.txt.keycloak.authserver.config.SimplePlatformProvider
+
+------------------------------------------------------------------------------------
+
+otcr wyvu oucy lfli
+
+Generated app password
+Your app password for your device
+otcr wyvu oucy lfli
+How to use it
+Go to the settings for your Google Account in the application or device you are trying to set up. Replace your password with the 16-character password shown above.
+Just like your normal password, this app password grants complete access to your Google Account. You won't need to remember it, so don't write it down or share it with anyone.
+
+------------------------------------------------------------------------------------
+

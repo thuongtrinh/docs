@@ -1,0 +1,787 @@
+Pull elasticsearch, use specific version to install
+
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.13.2
+
+---------------------------------------------------------------------------------
+
+docker pull kibana:7.13.2
+
+---------------------------------------------------------------------------------
+
+docker pull elasticsearch
+
+docker pull docker.elastic.co/kibana/kibana:7.13.2
+docker pull kibana:7.13.2
+
+
+docker run -d --name elasticsearch --net somenetwork -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.13.2
+
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.13.2
+
+docker run -d --name kibana --net somenetwork -p 5601:5601 kibana:tag
+
+docker run -d --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:7.13.2
+
+
+---------------------------------------------------------------------------------
+Fix error -> bootstrap check failure [1] of [1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+On window:
+wsl -d docker-desktop
+sysctl -w vm.max_map_count=262144
+
+---------------------------------------------------------------------------------
+
+Check start server elasticsearch
+
+$ curl -XGet localhost:9200
+
+---------------------------------------------------------------------------------
+
+RESET PASSWORD LOGIN IN ELASTIC
+bin/elasticsearch-reset-password -u user1 -i <password>
+
+
+=================================================================
+
+
+curl -XGET "http://es-container:9200/bookdb_index/_search" -H 'Content-Type: application/json' -d'{  "size": 0,   "aggs": { "unique_skus": { "cardinality": {        "field": "num_reviews"      }    }  }}'
+
+curl -XGET "http://es-container:9200/bookdb_index/_search" -H 'Content-Type: application/json' -d'{  "size": 0,   "aggs": { "quantity_stats": { "stats": {        "field": "num_reviews"      }    }  }}'
+
+
+-----------------------------------Tạo index db----------------------------------------------
+
+PUT /bookdb_index
+    { "settings": { "number_of_shards": 1 }}
+
+POST /bookdb_index/_bulk
+    { "index": { "_id": 1 }}
+    { "title": "Elasticsearch: The Definitive Guide", "authors": ["clinton gormley", "zachary tong"], "summary" : "A distibuted real-time search and analytics engine", "publish_date" : "2015-02-07", "num_reviews": 20, "publisher": "oreilly" }
+
+
+GET /bookdb_index/_search
+GET /bookdb_index/_search?q=guide
+GET /bookdb_index/_search?q=title:in action
+
+GET _cluster/health?pretty
+
+
+---------------------------------------------------------------------------------
+
+Commands to manage on elasticsearch
+
+1. GET /_cat/health?v
+wsl curl -X GET http://localhost:9200/_cat/health?v    OR   wsl curl -XGET "http://localhost:9200/_cat/health?v"   -> xem health của server 
+
+2. GET /_cat/indices?v
+wsl curl -XGET "http://localhost:9200/_cat/indices?v"  -> xem các index
+
+3. PUT /article?pretty
+wsl curl -XPUT "http://localhost:9200/article?pretty"  -> tạo index có tên article  (thêm tham số pretty để kết quả trả về dễ đọc)
+
+4. DELETE /article?pretty
+wsl curl -XDELETE "http://localhost:9200/article?pretty"  -> XÓA index có tên article
+
+5.Tạo 1 data cho 1 index (ví dụ student)
+PUT /student/_doc/1/
+{
+  "name":"thuongtx",
+  "age":18,
+  "subject" : ["Monhoc1", "Monhoc2"]
+}
+
+Cách 2: dùng cmd
+wsl curl -XPUT 'http://localhost:9200/student/_doc/3' -H 'Content-Type: application/json' -d '
+{
+	\"name\" : \"ten 002\",
+	\"age\" : 21
+}'
+
+6. Đọc tài liệu trong index với id truyền vào
+GET /student/_doc/1?pretty
+wsl curl -XGET "http://localhost:9200/student/_doc/1?pretty"  -> XÓA index có tên article
+
+7.GET /student/_doc/4
+wsl curl -XGET "http://localhost:9200/student/_doc/1?pretty"
+
+8.DELETE /student/_doc/4
+wsl curl -XDELETE "http://localhost:9200/student/_doc/4?pretty"
+
+9. Tạo doc hàng loạt cho index
+POST /_bulk
+{"index": {"_index": "student", "_id": 4}}
+{"name": "thuontx001", "age" : 29}
+{"index": {"_index": "student", "_id": 5}}
+{"name": "thuontx002", "age" : 29}
+{"index": {"_index": "student", "_id": 6}}
+{"name": "thuontx003", "age" : 29}
+
+Cách 2: dùng lệnh curl (với data_student.json là file chứa dữ liệu import)
+wsl curl -s -H "Content-Type: application/x-ndjson" -XPOST localhost:9200/_bulk --data-binary "@data_student.json"
+
+wsl curl -s -H "Content-Type: application/x-ndjson" -XPOST "localhost:9200/bank/_bulk?pretty" --data-binary "@accounts.json"
+
+
+------------------------------------------------------------------------------------------------
+ELS04 - Truy vấn tìm kiếm trên Elasticsearch
+
+1.
+GET /bank/_search
+{
+"query": { "match_all": {}}
+}
+
+========================Basic Match Query================================
+
+GET /bookdb_index/_search
+{
+"query": { "match_all": {}},
+"size": 20,
+ "sort": [
+   {
+     "num_reviews": {
+       "order": "desc"
+     }
+   }
+ ]
+}
+
+GET /bookdb_index/_search
+{
+"query": { "match_all": {}},
+"size": 20,
+ "sort": [
+   {
+     "publisher.keyword": {
+       "order": "desc"
+     }
+   }
+ ]
+}
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "match" : {
+            "title" : "in action"
+        }
+    },
+    "size": 2,
+    "from": 0,
+    "_source": [ "title", "summary", "publish_date" ],
+    "highlight": {
+        "fields" : {
+            "title" : {}
+        }
+    }
+}
+
+
+
+2. Dùng curl
+wsl curl -XGET 'localhost:9200/bookdb_index/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+\"query\": { \"match_all\": {}},
+\"size\": 20
+}'
+
+
+wsl curl -XGET 'localhost:9200/bookdb_index/_search?pretty' -H 'Content-Type: application/json' -d '
+{
+\"query\": { \"match_all\": {}},
+\"size\": 20,
+\"sort\": [
+   {
+     \"num_reviews\": {
+     \"order\": \"desc\"
+     }
+   }
+ ]
+}'
+
+========================Multi-field Search================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "multi_match" : {
+            "query" : "elasticsearch guide",
+            "fields": ["title", "summary"]
+        }
+    }
+}
+
+
+========================Boosting================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "multi_match" : {
+            "query" : "elasticsearch guide",
+            "fields": ["title", "summary^3"]
+        }
+    },
+    "_source": ["title", "summary", "publish_date"]
+}
+
+========================Bool Query================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "bool": {
+          "should": [
+              { "match": { "title": "Elasticsearch" }},
+              { "match": { "title": "Solr" }} 
+          ],
+          "must": [
+              { "match": { "authors": "clinton gormely"}}
+          ],
+          "must_not": [
+              { "match": {"authors": "radu gheorge" }}
+          ]
+        }
+    }
+}
+
+========================Fuzzy Queries================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "multi_match" : {
+            "query" : "comprihensiv guide",
+            "fields": ["title", "summary"],
+            "fuzziness": "AUTO"
+        }
+    },
+    "_source": ["title", "summary", "publish_date"],
+    "size": 10
+}
+
+========================Wildcard Query================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "wildcard" : {
+            "authors" : "t*"
+        }
+    },
+    "_source": ["title", "authors"],
+    "highlight": {
+        "fields" : {
+            "authors" : {}
+        }
+    }
+}
+
+========================Regexp Query================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "regexp" : {
+            "authors" : "t[a-z]*y"
+        }
+    },
+    "_source": ["title", "authors"],
+    "highlight": {
+        "fields" : {
+            "authors" : {}
+        }
+    }
+}
+
+========================Match Phrase Query================================
+
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "multi_match" : {
+            "query": "search engine",
+            "fields": ["title", "summary"],
+            "type": "phrase",
+            "slop": 2
+        }
+    },
+    "_source": [ "title", "summary", "publish_date" ]
+}
+
+========================Match Phrase Prefix================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "match_phrase_prefix" : {
+            "summary": {
+                "query": "search en",
+                "slop": 3,
+                "max_expansions": 10
+            }
+        }
+    },
+    "_source": [ "title", "summary", "publish_date" ]
+}
+
+========================Query String================================
+
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "query_string" : {
+            "query": "(search applications) AND (guide to) OR (engine)",
+            "fields": ["_all", "summary^2"]
+        }
+    },
+    "_source": [ "title", "summary", "authors" ],
+    "highlight": {
+        "fields" : {
+            "summary" : {}
+        }
+    }
+}
+
+========================Simple Query String================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "simple_query_string" : {
+            "query": "(saerch~1 algorithm~1) + (grant ingersoll) | (tom engine)",
+            "fields": ["_all", "summary^2"]
+        }
+    },
+    "_source": [ "title", "summary", "authors" ],
+    "highlight": {
+        "fields" : {
+            "summary" : {}
+        }
+    }
+}
+
+========================Term/Terms Query================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "term" : {
+            "publisher": "manning"
+        }
+    },
+    "_source" : ["title","publish_date","publisher"]
+}
+
+========================Term Query - Sorted================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "term" : {
+            "publisher": "manning"
+        }
+    },
+    "_source" : ["title","publish_date","publisher"],
+    "sort": [
+        { "publish_date": {"order":"desc"}},
+        { "title.keyword": { "order": "desc" }}
+    ]
+}
+
+=========================Range Query===============================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "range" : {
+            "publish_date": {
+                "gte": "2015-01-01",
+                "lte": "2015-12-31"
+            }
+        }
+    },
+    "_source" : ["title","publish_date","publisher"]
+}
+
+==========================Filtered Query (deprecated). You should now use the boolean query==============================
+
+POST /bookdb_index/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "multi_match" : {
+            "query": "search engine",
+            "fields": ["title", "summary"]
+        }
+      },
+      "filter": {
+        "range": {
+          "num_reviews": {
+            "gte": 20
+          }
+        }
+      }
+    }
+  }
+}
+
+========================Multiple Filters================================
+
+POST /bookdb_index/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "multi_match" : {
+            "query": "search engine",
+            "fields": ["title", "summary"]
+        }
+      },
+      "filter": {
+          "bool": {
+              "must": {
+                  "range" : { "num_reviews": { "gte": 20 } }
+              },
+              "must_not": {
+                  "range" : { "publish_date": { "lte": "2014-12-31" } }
+              },
+              "should": {
+                  "term": { "publisher": "oreilly" }
+              }
+          }
+      }
+    }
+  }
+}
+
+========================Function Score: Field Value Factor================================
+
+POST /bookdb_index/_search
+{
+    "query": {
+        "function_score": {
+            "query": {
+                "multi_match" : {
+                    "query" : "search engine",
+                    "fields": ["title", "summary"]
+                }
+            },
+            "field_value_factor": {
+                "field" : "num_reviews",
+                "modifier": "log1p",
+                "factor" : 2
+            }
+        }
+    },
+    "_source": ["title", "summary", "publish_date", "num_reviews"]
+}
+
+
+========================Function Score: Script scoring (ta có thể tự viết các hàm custom đáp ứng nhu cầu của mình)================================
+
+POST /bookdb_index/book/_search
+{
+    "query": {
+        "function_score": {
+            "query": {
+                "multi_match" : {
+                    "query" : "search engine",
+                    "fields": ["title", "summary"]
+                }
+            },
+            "functions": [
+                {
+                    "script_score": {
+                        "params" : {
+                            "threshold": "2015-07-30"
+                        },
+                        "script": "publish_date = doc['publish_date'].value; num_reviews = doc['num_reviews'].value; if (publish_date > Date.parse('yyyy-MM-dd', threshold).getTime()) { return log(2.5 + num_reviews) }; return log(1 + num_reviews);"
+                    }
+                }
+            ]
+        }
+    },
+    "_source": ["title", "summary", "publish_date", "num_reviews"]
+}
+
+================================================================================================================================
+
+
+GET /bookdb_index/_search
+{
+  "query": { 
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "title": ":"
+          }
+        },
+        {
+          "match": {
+            "title": "The"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "title": "to"
+          }
+        }
+      ]
+    }
+  }
+}
+
+==============================Elasticsearch Aggregations - 1. Cardinality aggregation ===================================
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+  "aggs": {
+    "unique_num_reviews": {
+      "cardinality": {
+        "field": "num_reviews"
+      }
+    }
+  }
+}
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+  "aggs": {
+    "unique_publisher": {
+      "cardinality": {
+        "field": "publisher.keyword"
+      }
+    }
+  }
+}
+
+==============================Stats Aggregation===================================
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+  "aggs": {
+    "quantity_stats": {
+      "stats": {
+        "field": "num_reviews"
+      }
+    }
+  }
+}
+
+==============================Filter Aggregation===================================
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+  "aggs": {
+      "User_based_filter" : {
+          "filter" : {
+            "term": { "publisher": "manning"}
+          },
+          "aggs" : {
+              "avg_price" : { 
+                "avg" : { "field" : "num_reviews" }
+              }
+          }
+      }
+  }
+}
+
+==============================Terms Aggregation===================================
+
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+   "aggs": {
+      "Terms_Aggregation" : {
+          "terms": { "field": "publisher.keyword" }
+      }
+    }
+}
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+   "aggs": {
+      "Terms_Aggregation" : {
+          "terms": { "field": "title.keyword" }
+      }
+    }
+}
+
+
+GET /bookdb_index/_search
+{
+  "size": 0, 
+   "aggs": {
+      "Terms_Aggregation" : {
+          "terms": { "field": "num_reviews" }
+      }
+    }
+}
+
+
+POST /bookdb_index/_search
+{
+  "size": 0,
+  "aggs": {
+    "group_by_state": {
+      "terms": {
+        "field": "title.keyword"
+      },
+      "aggs": {
+        "sum_": {
+          "sum": {
+            "field": "num_reviews"
+          }
+        }
+      }
+    }
+  }
+}
+
+==============================Nested Aggregation===================================
+
+GET /nested_aggregation/_search
+{
+  "aggs": {
+    "Nested_Aggregation" : {
+        "nested": { "path": "Employee" }, 
+        "aggs": {
+            "Min_Salary": {
+            "min": { "field": "Employee.salary" }
+        }
+      }
+    }
+  }
+}
+
+==============================Percentile Ranks===================================
+
+GET bookdb_index/_search
+{
+  "size": 0,
+  "aggs": {
+    "cost_per_rank": {
+      "percentile_ranks": {
+        "field": "cost",
+        "values": [
+          100,
+          12000
+        ]
+      }
+    }
+  }
+}
+
+GET bookdb_index/_search
+{
+  "size": 0,
+  "aggs": {
+    "cost_per_rank": {
+      "percentile_ranks": {
+        "field": "cost",
+        "values": [
+          100,
+          12000
+        ],
+        "keyed": false
+      }
+    }
+  }
+ 
+==============================Top hits===================================
+
+
+GET bookdb_index/_search
+{
+  "size": 0,
+  "aggs": {
+    "top_hits_cost": {
+      "top_hits": {
+        "size": 100
+        , "_source": {
+          "includes": "cost"
+        }
+      }
+
+    }
+  }
+}
+
+
+GET bookdb_index/_search
+{
+  "size": 0,
+  "aggs": {
+    "state-aggs": {
+      "terms": {
+        "field": "title.keyword",
+        "size": 100
+      },
+      "aggs": {
+        "max-cost": {
+          "max": {
+            "field": "cost"
+          }
+        },
+        "top-acc": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "cost": {
+                  "order": "desc"
+                }
+              }
+            ],
+            "_source": {
+              "includes": ["summary", "cost", "title"]
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> Elasticsearch security features have been automatically configured!
+-> Authentication is enabled and cluster connections are encrypted.
+
+->  Password for the elastic user (reset with `bin/elasticsearch-reset-password -u elastic`):
+  123456
+
+->  HTTP CA certificate SHA-256 fingerprint:
+  13bc2870b0a62d59a359210ee7a9b131ebc28d0a3e1c47b74e86b4227d19aebe
+
+->  Configure Kibana to use this cluster:
+* Run Kibana and click the configuration link in the terminal when Kibana starts.
+* Copy the following enrollment token and paste it into Kibana in your browser (valid for the next 30 minutes):
+  eyJ2ZXIiOiI4LjAuMCIsImFkciI6WyIxNzIuMjQuNjQuMTo5MjAwIiwiMTcyLjI2LjQ4LjE6OTIwMCIsIjE5Mi4xNjguMS42OjkyMDAiXSwiZmdyIjoiMTNiYzI4NzBiMGE2MmQ1OWEzNTkyMTBlZTdhOWIxMzFlYmMyOGQwYTNlMWM0N2I3NGU4NmI0MjI3ZDE5YWViZSIsImtleSI6Ii1lTEFGWDhCZVhucm5fbWhkUnVEOnRNZEpuWGVEUTkyRkZtMURfOFE2VHcifQ==
+
+->  Configure other nodes to join this cluster:
+* On this node:
+  - Create an enrollment token with `bin/elasticsearch-create-enrollment-token -s node`.
+  - Uncomment the transport.host setting at the end of config/elasticsearch.yml.
+  - Restart Elasticsearch.
+* On other nodes:
+  - Start Elasticsearch with `bin/elasticsearch --enrollment-token <token>`, using the enrollment token that you generated.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+wsl curl localhost:9200/productindex/_search?pretty
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
