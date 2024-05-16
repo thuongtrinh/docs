@@ -238,10 +238,20 @@ yum install openssl
 Step3: Tạo private key
 mkdir -p /etc/httpd/conf/tinhocthatladongian-ssl
 cd /etc/httpd/conf/tinhocthatladongian-ssl
-openssl genrsa } server.key
+openssl genrsa > server.key
+
+----------------
+mkdir -p /etc/httpd/conf/web-demo-ssl
+cd etc/httpd/conf/web-demo-ssl
+openssl genrsa > server.key
+----------------
 
 Step4: Tiếp theo, tạo file CSR, file CSR này được sử dụng khi cơ quan cấp chứng chỉ cấp chứng chỉ cho máy chủ
-openssl req -new -key server.key } server.csr
+openssl req -new -key server.key > server.csr
+	
+----------------
+openssl req        -new server.key >  server.csr
+----------------
 
 Step5: Gửi file server.csr ở trên cho nhà cung cấp SSL(nơi bạn muốn mua SSL) bạn sẽ nhận được các file cerfiticate
 ví dụn mình dùng sslforfree để thực hành bài này
@@ -279,8 +289,7 @@ Step9:  Mở cổng 443 cho ssl trên firewall
 Bài 8: Cài đặt FTP Server trên AWS EC2 Linux
 
 ---------------------------------
-Tin học thật là đơn giản 
-Bạn có thể dùng cú pháp này để chỉ cho phép user login vào FTP
+Tin học thật là đơn giản - Bạn có thể dùng cú pháp này để chỉ cho phép user login vào FTP
 usermod -s /sbin/nologin username
 ---------------------------------
 
@@ -526,7 +535,7 @@ server {
  listen 443;
  
  ssl on;
- ssl_certificate      /path/tinhocthatladongian.coderhanoi.com.crt;　
+ ssl_certificate      /path/tinhocthatladongian.coderhanoi.com.crt;
  ssl_certificate_key  /path/tinhocthatladongian.coderhanoi.com.key;
  
     server_name   tinhocthatladongian.coderhanoi.com;
@@ -588,7 +597,7 @@ server {
  listen 443;
  
  ssl on;
- ssl_certificate      /path/tinhocthatladongian.coderhanoi.com.crt;　
+ ssl_certificate      /path/tinhocthatladongian.coderhanoi.com.crt;
  ssl_certificate_key  /path/tinhocthatladongian.coderhanoi.com.key;
  
     server_name   tinhocthatladongian.coderhanoi.com;

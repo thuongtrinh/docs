@@ -1,9 +1,3 @@
-Mục tiêu năm nay:
-Devops
-Ng,React
-Python
-Deep Java
-
 
 -- used in tests that use HSQL
 create table oauth_client_details (
