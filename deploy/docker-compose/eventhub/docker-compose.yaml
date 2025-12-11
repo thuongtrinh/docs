@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  eventhubs-emulator:
+    image: mcr.microsoft.com/azure-messaging/eventhubs-emulator
+    container_name: eventhubs-emulator
+    ports:
+      - "5672:5672" # AMQP port
+      - "9092:9092" # Kafka port
+    environment:
+      - ACCEPT_EULA=Y # Accept the Microsoft Software License Terms
+      - CONFIG_PATH=/app/config.json # Path to the configuration file within the container
+    volumes:
+      - ./config.json:/app/config.json # Mount your local config.json

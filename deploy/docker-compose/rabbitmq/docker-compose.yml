@@ -1,0 +1,11 @@
+version: '2.2'
+
+services:
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+# docker exec rabbitmq rabbitmq-plugins enable rabbitmq_management

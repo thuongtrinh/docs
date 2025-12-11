@@ -1,0 +1,14 @@
+{
+  "EventHubs": [
+    {
+      "Name": "my-eventhub",
+      "PartitionCount": 4
+    }
+  ],
+  "KafkaTopics": [
+    {
+      "Name": "my-kafka-topic",
+      "PartitionCount": 3
+    }
+  ]
+}
