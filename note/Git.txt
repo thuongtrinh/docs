@@ -328,6 +328,10 @@ Github SSH
 Following the instructions on this GitHub page, I executed the command:
 ssh -vT git@github.com
 
+
+ssh -T git@github.com
+# Attempts to ssh to GitHub
+
 ------------------------------------------------------------------------------------------------------
 ssh-keygen -t rsa
 
@@ -563,5 +567,24 @@ develop.html faq.html README.md tag.html version1.txt
 Nếu bạn không cần dùng tới branch nào nữa thì có thể xóa với lệnh git branch -d tên_branch. Lưu ý là cái branch muốn xóa phải được gộp dữ liệu (merge) về master.
 $ git branch -d develop
 
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Bước 1: Tạo repository trên github/gitlab
+
+Bước 2: Đẩy dự án lên repository vừa tạo
+git add .
+git commit -m "init project"
+
+https://stackoverflow.com/questions/2432764/how-do-i-change-the-uri-url-for-a-remote-git-repository
+
+git remote set-url origin new.git.url/here
+
+git push origin master
+
+Bước 3: Minh họa khi code xong 1 video, chỉ cần sử dụng 3 câu lệnh bên dưới
+git add .
+git commit
+git push 
 
 ---------------------------------------------------------------------------------------------------------------------------------------

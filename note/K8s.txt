@@ -648,4 +648,50 @@ Step 1: run PowerShell as administrator
 Step 2: run following command choco upgrade minikube
 
 
--------------------------------------------------------------
+------------------------kubectl cheat sheet-------------------------------------
+- Liệt kê các tài nguyên:
+kubectl get nodes	    Liệt kê tất cả các nodes trong cluster
+kubectl get namespaces	Liệt kê tất cả các namespaces trong cluster
+kubectl get pods	    Liệt kê tất cả các pods trong namespace mặc định của cluster
+kubectl get pods -n name	Liệt kê tất cả các pods trong namespace "name"
+
+- Tạo các tài nguyên:	
+kubectl create namespace name	Tạo một namespace với tên "name"
+kubectl create -f [filename]	Tạo một tài nguyên từ tệp JSON hoặc YAML:
+
+- Điều chỉnh các tài nguyên:
+kubectl edit svc/servicename	Điều chỉnh một service
+
+- Thông tin chi tiết hơn về tài nguyên:
+kubectl describe nodes	    hiển thị chi tết trạng thái của các nodes
+
+- Xoá tài nguyên:
+kubectl delete pod	        Xoá các tài nguyên, có thể tử stdin hoặc tệp
+
+Bạn có thể muốn biết các tên viết tắt của một số tài nguyên trên kubectl, ví dụ -n là tên viết tắt của namespace giúp bạn dễ dàng thao tác hơn và làm code của bạn trông gọn gàng hơn.
+
+Tên rút gọn	Tên đầy đủ
+csr	    certificatesigningrequests
+cs	    componentstatuses
+cm	    configmaps
+ds	    daemonsets
+deploy	deployments
+ep	    endpoints
+ev	    events
+hpa	    horizontalpodautoscalers
+ing	    ingresses
+limits	limitranges
+ns	    namespaces
+no	    nodes
+pvc	    persistentvolumeclaims
+pv	    persistentvolumes
+po	    pods
+pdb	    poddisruptionbudgets
+psp	    podsecuritypolicies
+rs	    replicasets
+rc	    replicationcontrollers
+quota	resourcequotas
+sa	    serviceaccounts
+svc	    services
+--------------------------------------------------------------------------
+

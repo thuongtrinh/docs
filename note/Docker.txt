@@ -493,6 +493,41 @@ docker build -t myimage:v1 -f Dockerfile
 -t myimage 		: Đặt tên image
 -f Dockerfile	: Tên docker file
 
+----------------------------
+Note dockerfile:
+----------------------------
+Lệnh	Mục đích
+FROM	Để chỉ định hình ảnh gốc.
+WORKDIR	Để đặt thư mục làm việc cho bất kỳ lệnh nào phía sau trong Dockerfile.
+RUN		Để chạy các câu lệnh giúp cài đặt bất kỳ ứng dụng và package nào cần thiết cho container của bạn.
+COPY	Để sao chép các tệp hoặc thư mục từ một vị trí cụ thể.
+ADD		Là COPY, nhưng cũng có thể xử lý các URL và giải nén các tệp nén.
+ENTRYPOINT	Lệnh sẽ luôn được thực thi khi container khởi động. Nếu không được chỉ định, giá trị mặc định là /bin/sh -c
+CMD		Các đối số được chuyển đến điểm vào. Nếu ENTRYPOINT không được cấu hình (mặc định là /bin/sh -c), CMD sẽ là các lệnh mà container thực thi.
+EXPOSE	Để xác định cổng nào để truy cập ứng dụng container của bạn.
+LABEL	Để thêm metadata vào image.
+
+Example:
+------------------------
+FROM openjdk:8-slim
+
+RUN apt-get update -y
+RUN apt-get install curl -y
+
+RUN mkdir /app
+WORKDIR ./app
+ 
+#import cert into java
+COPY $CERT ./app
+RUN keytool -import -trustcacerts -file ./app/RootCA.cer -alias pru_ad_root -keystore /usr/local/openjdk-8/jre/lib/security/cacerts -storepass changeit -noprompt 
+
+COPY ./target/*.jar ./app/app.jar
+
+CMD ["java", "-jar", "./app/app.jar", "-Doracle.jdbc.timezoneAsRegion=false -Duser.timezone=GMT"]
+
+ENV TZ=Asia/Jakarta
+EXPOSE 8077
+------------------------
 
 ------------------------------------------------
 D12 - Sử dụng lệnh docker-compose chạy và quản lý các dịch vụ Docker
@@ -502,7 +537,7 @@ docker-compose -> thiết lập mặc định bởi file yaml (*.yml)
 docker-compose up
 docker-compose down
 
-docker-compose up -d  -> start running background
+docker-compose up -d  -> start running background (d: detached mode)
 
 docker-compose ps
 docker-compose ps --service  -> kiểm tra các dịch vụ trong docker-compose
@@ -521,6 +556,7 @@ docker-compose stop
 docker-compose rm
 docker-compose up
 
+docker-compose down --volumes
 
 ------------------------------------------------
 D14 - Sử dụng Haproxy làm server cân bằng tải với Docker
