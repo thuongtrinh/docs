@@ -1,0 +1,20 @@
+1. Dự án Spring for GraphQL cung cấp khả năng tích hợp chính thức cho Spring Boot
+https://github.com/bezkoder/spring-boot-graphql-example (H2)
+https://github.com/bezkoder/spring-boot-graphql-postgresql
+https://github.com/piomin/sample-spring-boot-graphql (kickstart/netflix-dgs/spring-graphql)
+https://github.com/graphql-java-kickstart/graphql-spring-boot (This repository was archived)
+https://github.com/wazooinc/spring-boot-3-graphql-demo
+https://github.com/eh3rrera/graphql-java-spring-boot-example
+
+advanced:
+https://github.com/aenesgur/GraphQL-Java-Spring-Boot-Project
+https://github.com/theam/spring-boot-graphql-demo (security)
+
+---------------------------------------------------------
+2. Dự án Spring Batch Example
+https://github.com/Rapter1990/batchprocessingcsvtodatabase
+https://github.com/spring-guides/gs-batch-processing
+https://github.com/ali-bouali/spring-batch-demo
+
+---------------------------------------------------------
+
